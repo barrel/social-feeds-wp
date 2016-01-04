@@ -67,10 +67,6 @@ class SocialFeeds {
       );
     });
 
-    add_action( 'admin_post_social_feed_curate', function() {
-      
-    });
-
   }
 
 }
