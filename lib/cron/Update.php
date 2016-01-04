@@ -70,6 +70,10 @@ class Update {
       update_post_meta($id, 'social_post_created', $social_post->created_time);
       update_post_meta($id, 'social_post_details', json_encode($social_post));
 
+      if(isset($social_post->videos)) {
+        update_post_meta($id, 'social_post_video', json_encode($social_post->videos->standard_resolution));
+      }
+
       media_sideload_image($social_post->images->standard_resolution->url, $id);
 
       $images = array_values(get_attached_media('image', $id));
