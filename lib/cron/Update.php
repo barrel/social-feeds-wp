@@ -5,7 +5,6 @@ use MetzWeb\Instagram\Instagram;
 class Update {
 
   function __construct() {
-    
     $this->instagram = new Instagram(array(
       'apiKey'      => get_option('instagram_client_id'),
       'apiSecret'   => get_option('instagram_client_secret'),
@@ -16,19 +15,22 @@ class Update {
   }
 
   function fetch_instagram() {
-    // $hashtag_string = get_option('instagram_hashtag');
+    $hashtag_string = trim(get_option('instagram_feed_hashtag'));
 
-    // if(!empty($hashtag_string)) {
-    //   $hashtag_string = str_replace('#', '', $hashtag_string);
-    //   $tags = explode(' ', $hashtag_string);
+    if(!empty($hashtag_string)) {
+      $hashtag_string = str_replace('#', '', $hashtag_string);
+      $tags = explode(' ', $hashtag_string);
 
-    //   foreach ($tags as $tag) {
-    //     $feed = $this->instagram->getTagMedia($tag, 30);
-    //     $this->handle_instagram($feed);
-    //   }
-    // }
+      foreach ($tags as $tag) {
+        $feed = $this->instagram->getTagMedia($tag, 30);
+        
+        foreach ($feed->data as $social_post) {
+          $this->update_social_post($social_post);
+        }
+      }
+    }
 
-    $username_string = get_option('instagram_username');
+    $username_string = trim(get_option('instagram_feed_username'));
 
     if(!empty($username_string)) {
       $usernames = explode(' ', $username_string);
@@ -39,14 +41,14 @@ class Update {
         $feed = $this->instagram->getUserMedia($user_id, 30);
 
         foreach ($feed->data as $social_post) {
-          $this->handle_social_post($social_post);
+          $this->update_social_post($social_post);
         }
       }
     }
 
   }
 
-  function handle_social_post($social_post) {
+  function update_social_post($social_post) {
     $existing = get_posts(array(
       'post_type' => 'social-post',
       'post_status' => 'any',
