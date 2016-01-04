@@ -1,0 +1,34 @@
+.social-post-cards {
+  position: relative;
+  margin-left: -10px;
+  margin-right: -10px; }
+  .social-post-cards, .social-post-cards * {
+    box-sizing: border-box; }
+
+.social-post-card {
+  position: relative;
+  display: block;
+  padding: 10px;
+  width: 200px;
+  display: inline-block;
+  vertical-align: top; }
+  .social-post-card img {
+    max-width: 100%; }
+  .social-post-card input {
+    position: absolute;
+    bottom: 20px;
+    left: 20px; }
+    .social-post-card input + .label {
+      position: absolute;
+      bottom: 20px;
+      left: 42px;
+      color: white; }
+  .social-post-card .social-post-details {
+    color: white;
+    background: #333;
+    padding: 10px;
+    padding-bottom: 50px; }
+  .social-post-card input:checked ~ .social-post-details {
+    background: green; }
+
+/*# sourceMappingURL=../../assets/css/social-feeds-admin.min.css.map */

@@ -1,0 +1,14 @@
+{
+    "name": "social-feeds",
+    "authors": [],
+    "require": {
+        "cosenary/instagram": "^2.3",
+        "j7mbo/twitter-api-php": "^1.0",
+        "abraham/twitteroauth": "^0.6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Barrel\\SocialFeeds\\": "lib"
+        }
+    }
+}
