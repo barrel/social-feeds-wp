@@ -40,26 +40,30 @@ class SelectPosts extends AdminPage {
         <?php submit_button(); ?>
         <div class="social-post-cards">
           <?php
-          while ($this->query->have_posts()) { $this->query->the_post();
-            $item_id = get_the_ID();
-            $item_checked = (get_post_status($item_id) == 'publish') ? 'checked' : '';
-            $item_image = get_post_meta($item_id, 'social_post_image', true);
-            $item_user = get_post_meta($item_id, 'social_post_username', true);
-            $item_content = get_the_title();
-            ?>
-            <label class="social-post-card">
-              <input type="checkbox" name="social-post-publish[]" value="<?= $item_id ?>" <?= $item_checked ?>>
-              <span class="label">Publish</span>
-              <div class="social-post-details">
-                <?php the_post_thumbnail('thumbnail'); ?>
-                <p><?= $item_content ?></p>
-                <p class="user"><?= $item_user ?></p>
-              </div>
-            </label>
-            <?php
-          }
+            if($this->query->have_posts()) {
+              while ($this->query->have_posts()) { $this->query->the_post();
+                $item_id = get_the_ID();
+                $item_checked = (get_post_status($item_id) == 'publish') ? 'checked' : '';
+                $item_image = get_post_meta($item_id, 'social_post_image', true);
+                $item_user = get_post_meta($item_id, 'social_post_username', true);
+                $item_content = get_the_title();
+                ?>
+                <label class="social-post-card">
+                  <input type="checkbox" name="social-post-publish[]" value="<?= $item_id ?>" <?= $item_checked ?>>
+                  <span class="label">Publish</span>
+                  <div class="social-post-details">
+                    <?php the_post_thumbnail('thumbnail'); ?>
+                    <p><?= $item_content ?></p>
+                    <p class="user"><?= $item_user ?></p>
+                  </div>
+                </label>
+                <?php
+              }
+
+              wp_reset_postdata();
+            }
           ?>
-        <div class="social-post-cards">
+        </div>
       </form>
     </div>
     <?php
