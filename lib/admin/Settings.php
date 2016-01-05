@@ -1,6 +1,9 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
 
+/**
+ * Creates the admin page for configuring plugin settings.
+ */
 class Settings extends AdminPage {
 
   static $page_title = 'Social Feed Settings';

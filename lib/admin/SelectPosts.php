@@ -2,24 +2,38 @@
 namespace Barrel\SocialFeeds\Admin;
 use Barrel\SocialFeeds\Cron\Update;
 
+/**
+ * Creates the admin page for selecting posts to publish.
+ */
 class SelectPosts extends AdminPage {
 
   static $page_title = 'Select Social Posts';
   static $menu_title = 'Select Posts';
   static $menu_slug = 'select-posts';
 
+  /**
+   * Constructs the admin page and sets up actions
+   */
   function __construct() {
     parent::__construct();
 
     add_action('admin_post_curate_social_feed', array($this, 'curate_feed'));
+    add_action('current_screen', array($this, 'query_social_posts'));
+  }
 
-    $this->query = new \WP_Query(array(
-      'post_type' => 'social-post',
-      'post_status' => 'any',
-      'posts_per_page' => -1,
-      'meta_key' => 'social_post_created',
-      'orderby' => 'meta_value'
-    ));
+  /**
+   * Query social posts for the admin page
+   */
+  function query_social_posts($current_screen) {
+    if($current_screen->id == 'social-post_page_select-posts') {
+      $this->query = new \WP_Query(array(
+        'post_type' => 'social-post',
+        'post_status' => 'any',
+        'posts_per_page' => -1,
+        'meta_key' => 'social_post_created',
+        'orderby' => 'meta_value'
+      ));
+    }
   }
 
   function add_options_page() {
@@ -69,6 +83,9 @@ class SelectPosts extends AdminPage {
     <?php
   }
 
+  /**
+   * Handle POST request to curate social posts. Publishes any checked posts and unpublishes any unchecked posts.
+   */
   function curate_feed() {
     if(isset($_REQUEST['social-post-publish']) && is_array($_REQUEST['social-post-publish'])) {
       $published_posts = get_posts(array(

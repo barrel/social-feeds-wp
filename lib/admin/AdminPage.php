@@ -1,6 +1,9 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
 
+/**
+ * Base admin page class, initializes common functionality for admin pages.
+ */
 class AdminPage {
 
   static $page_title = 'Settings';
@@ -14,10 +17,16 @@ class AdminPage {
     add_action('admin_menu', array($this, 'add_options_page'));
   }
 
+  /**
+   * Register any options for this admin page (called on admin_init).
+   */
   function initialize_options() {
     
   }
 
+  /**
+   * Adds this page to the admin menu using static properties (can be overridden by child classes).
+   */
   function add_options_page() {
     add_submenu_page(
       static::$parent_slug,
@@ -29,6 +38,9 @@ class AdminPage {
     );
   }
 
+  /**
+   * Render the HTML for the admin page content.
+   */
   function display_options_page() {
     ?>
     <div class="wrap">
@@ -43,6 +55,9 @@ class AdminPage {
     <?php
   }
 
+  /**
+   * Render the HTML for a single text field setting.
+   */
   function render_text_setting($args) {
     $option = get_option( $args[0] );
     

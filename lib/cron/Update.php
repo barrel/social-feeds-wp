@@ -2,8 +2,14 @@
 namespace Barrel\SocialFeeds\Cron;
 use MetzWeb\Instagram\Instagram;
 
+/**
+ * Pulls the latest social posts and saves them to custom post type.
+ */
 class Update {
 
+  /**
+   * Initializes the Instagram API and fetches the latest posts
+   */
   function __construct() {
     $this->instagram = new Instagram(array(
       'apiKey'      => get_option('instagram_client_id'),
@@ -14,6 +20,9 @@ class Update {
     $this->fetch_instagram();
   }
 
+  /**
+   * Fetches Instagram posts based on the provided usernames and hashtags
+   */
   function fetch_instagram() {
     $hashtag_string = trim(get_option('instagram_feed_hashtag'));
 
@@ -48,6 +57,9 @@ class Update {
 
   }
 
+  /**
+   * Handles a social API response by adding or updating posts in custom post type.
+   */
   function update_social_post($social_post) {
     $existing = get_posts(array(
       'post_type' => 'social-post',

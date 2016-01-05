@@ -9,6 +9,9 @@ namespace Barrel\SocialFeeds;
 
 require('vendor/autoload.php');
 
+/**
+ * Base plugin class, initializes theme and admin functionality.
+ */
 class SocialFeeds {
 
   function __construct() {
@@ -26,6 +29,9 @@ class SocialFeeds {
 
   }
 
+  /**
+   * Registers the custom post type for social posts.
+   */
   function init_post_type() {
 
     register_post_type('social-post', array(
@@ -45,6 +51,9 @@ class SocialFeeds {
 
   }
 
+  /**
+   * Initializes admin screens and enqueues scripts & styles
+   */
   function init_admin() {
 
     new Admin\SelectPosts;
@@ -71,4 +80,5 @@ class SocialFeeds {
 
 }
 
+/** Instantiate the plugin class. */
 new SocialFeeds;
