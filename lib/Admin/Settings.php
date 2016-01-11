@@ -15,6 +15,7 @@ class Settings extends AdminPage {
   function initialize_options() {
     add_option('instagram_client_id', '');
     add_option('instagram_client_secret', '');
+    add_option('instagram_access_token', '');
     add_option('instagram_feed_hashtag', 'barrelny');
     add_option('instagram_feed_username', 'barrelny');
 
@@ -29,7 +30,7 @@ class Settings extends AdminPage {
 
     add_settings_field(
       'instagram_client_id',
-      'Instagram Client ID',
+      'Client ID',
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',
@@ -40,7 +41,7 @@ class Settings extends AdminPage {
 
     add_settings_field(
       'instagram_client_secret',
-      'Instagram Client Secret',
+      'Client Secret',
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',
@@ -49,9 +50,30 @@ class Settings extends AdminPage {
 
     register_setting('instagram_settings', 'instagram_client_secret');
 
+    $oauth_link = 'https://instagram.com/oauth/authorize/?';
+
+    $oauth_params = array(
+      'client_id' => get_option('instagram_client_id'),
+      'redirect_uri' => home_url('/?callback=instagram_auth'),
+      'response_type' => 'code'
+    );
+
+    $oauth_link .= http_build_query($oauth_params);
+
+    add_settings_field(
+      'instagram_access_token',
+      'Access Token',
+      array($this, 'render_text_setting'),
+      self::$menu_slug,
+      'instagram_settings',
+      array('instagram_access_token', '<a href="'.$oauth_link.'">Generate Access Token</a>')
+    );
+
+    register_setting('instagram_settings', 'instagram_access_token');
+
     add_settings_field(
       'instagram_feed_hashtag',
-      'Instagram Hashtag(s)',
+      'Hashtag(s)',
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',
@@ -62,7 +84,7 @@ class Settings extends AdminPage {
 
     add_settings_field(
       'instagram_feed_username',
-      'Instagram Username(s)',
+      'Username(s)',
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',

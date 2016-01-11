@@ -6,6 +6,7 @@ Version: 0.0.1
 */
 
 namespace Barrel\SocialFeeds;
+use MetzWeb\Instagram\Instagram;
 
 require('vendor/autoload.php');
 
@@ -16,24 +17,25 @@ class SocialFeeds {
 
   function __construct() {
 
-    add_action('init', array($this, 'init_post_type'));
+    add_action('init', array($this, 'init'));
 
     if(is_admin()) {
       $this->init_admin();
     }
 
-    if(isset($_SERVER['REDIRECT_URL']) &&
-      $_SERVER['REDIRECT_URL'] == '/instagram-cron/') {
-      new Cron\Update;
-    }
-
   }
 
   /**
-   * Registers the custom post type for social posts.
+   * Initialize plugin
    */
-  function init_post_type() {
+  function init() {
 
+    if(isset($_REQUEST['callback']) &&
+      $_REQUEST['callback'] == 'instagram_auth') {
+      $this->retrieve_access_token();
+    }
+
+    /** Register the custom post type for social posts. */
     register_post_type('social-post', array(
       'labels' => array(
         'name' => 'Social Posts',
@@ -52,7 +54,7 @@ class SocialFeeds {
   }
 
   /**
-   * Initializes admin screens and enqueues scripts & styles
+   * Initialize admin functionality
    */
   function init_admin() {
 
@@ -76,6 +78,29 @@ class SocialFeeds {
       );
     });
 
+  }
+
+  /**
+   * Handle the Instagram OAuth response to retrieve an access token
+   */
+  function retrieve_access_token() {
+    $instagram = new Instagram(array(
+      'apiKey' => get_option('instagram_client_id'),
+      'apiSecret' => get_option('instagram_client_secret'),
+      'apiCallback' => home_url('/?callback=instagram_auth')
+    ));
+
+    $code = $_REQUEST['code'];
+    $result = $instagram->getOAuthToken($code);
+
+    if(isset($result->access_token)) {
+      update_option('instagram_access_token', $result->access_token);
+
+      $settings_page = admin_url('edit.php?post_type=social-post&page=feed-settings');
+
+      \wp_redirect($settings_page);
+      exit;
+    }
   }
 
 }

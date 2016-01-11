@@ -12,10 +12,16 @@ class Update {
    */
   function __construct() {
     $this->instagram = new Instagram(array(
-      'apiKey'      => get_option('instagram_client_id'),
-      'apiSecret'   => get_option('instagram_client_secret'),
-      'apiCallback' => get_bloginfo('url').'/instagram-callback/'
+      'apiKey' => get_option('instagram_client_id'),
+      'apiSecret' => get_option('instagram_client_secret'),
+      'apiCallback' => home_url('/?callback=instagram_auth')
     ));
+
+    $token = get_option('instagram_access_token');
+
+    if(!empty($token)) {
+      $this->instagram->setAccessToken($token);
+    }
 
     $this->fetch_instagram();
   }

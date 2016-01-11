@@ -64,7 +64,7 @@ class AdminPage {
     echo '<input type="text" id="twitter" name="'.$args[0].'" value="' . htmlspecialchars($option) . '" size="50" />';
     
     if(isset($args[1])) {
-      echo '<br/><i>'.$args[1].'</i>';
+      echo '<br/>'.$args[1];
     }
   }
 
