@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var livereload = require('gulp-livereload');
 
 require('./tasks/sass');
 require('./tasks/browserify');
@@ -8,8 +7,6 @@ require('./tasks/browserify');
  * Defines the default (development) task for Gulp.
  */
 gulp.task('default', ['sass:dev', 'watchify'], function() {
-  livereload.listen();
-
   // Watch stylesheets
   gulp.watch([
     '**/*.scss'
@@ -19,9 +16,7 @@ gulp.task('default', ['sass:dev', 'watchify'], function() {
   gulp.watch([
     'assets/**/*.css',
     './assets/**/*.js'
-  ], function(event) {
-    livereload.changed(event.path);
-  });
+  ]);
 });
 
 gulp.task('dev', ['default']);
