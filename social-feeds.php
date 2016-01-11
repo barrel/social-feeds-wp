@@ -2,7 +2,7 @@
 /*
 Plugin Name: Social Feeds
 Description: Curate posts from social feeds.
-Version: 0.0.1
+Version: 0.0.2
 */
 
 namespace Barrel\SocialFeeds;
