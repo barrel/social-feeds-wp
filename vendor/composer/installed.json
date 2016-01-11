@@ -56,51 +56,6 @@
         ]
     },
     {
-        "name": "cosenary/instagram",
-        "version": "v2.3",
-        "version_normalized": "2.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/cosenary/Instagram-PHP-API.git",
-            "reference": "fbf4c82e2cc7e9a7fd6f9fd7bba1fd2c506102a5"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/cosenary/Instagram-PHP-API/zipball/fbf4c82e2cc7e9a7fd6f9fd7bba1fd2c506102a5",
-            "reference": "fbf4c82e2cc7e9a7fd6f9fd7bba1fd2c506102a5",
-            "shasum": ""
-        },
-        "require": {
-            "ext-curl": "*",
-            "php": ">=5.2.0"
-        },
-        "time": "2014-11-29 13:10:42",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "MetzWeb\\Instagram\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD"
-        ],
-        "authors": [
-            {
-                "name": "Christian Metz",
-                "email": "christian-metz1@gmx.net",
-                "homepage": "http://metzweb.net"
-            }
-        ],
-        "description": "An easy-to-use PHP Class for accessing Instagram's API.",
-        "homepage": "https://github.com/cosenary/Instagram-PHP-API",
-        "keywords": [
-            "api",
-            "instagram"
-        ]
-    },
-    {
         "name": "j7mbo/twitter-api-php",
         "version": "1.0.5",
         "version_normalized": "1.0.5.0",
@@ -150,6 +105,49 @@
             "api",
             "php",
             "twitter"
+        ]
+    },
+    {
+        "name": "cosenary/instagram",
+        "version": "dev-auth",
+        "version_normalized": "dev-auth",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ScottPolhemus/Instagram-PHP-API",
+            "reference": "484c974a1aae001f538ad354a004c354dd492ae5"
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.3.0"
+        },
+        "time": "2016-01-11 01:25:42",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.4-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "MetzWeb\\Instagram\\": "src"
+            }
+        },
+        "license": [
+            "BSD"
+        ],
+        "authors": [
+            {
+                "name": "Christian Metz",
+                "email": "christian-metz1@gmx.net",
+                "homepage": "http://metzweb.net"
+            }
+        ],
+        "description": "An easy-to-use PHP Class for accessing Instagram's API.",
+        "homepage": "https://github.com/cosenary/Instagram-PHP-API",
+        "keywords": [
+            "api",
+            "instagram"
         ]
     }
 ]

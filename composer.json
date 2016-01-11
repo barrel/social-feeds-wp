@@ -1,8 +1,14 @@
 {
     "name": "social-feeds",
     "authors": [],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/ScottPolhemus/Instagram-PHP-API"
+        }
+    ],
     "require": {
-        "cosenary/instagram": "^2.3",
+        "cosenary/instagram": "dev-auth",
         "j7mbo/twitter-api-php": "^1.0",
         "abraham/twitteroauth": "^0.6.2"
     },
