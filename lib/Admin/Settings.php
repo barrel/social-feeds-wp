@@ -1,5 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
+use MetzWeb\Instagram\Instagram;
 
 /**
  * Creates the admin page for configuring plugin settings.
@@ -50,15 +51,13 @@ class Settings extends AdminPage {
 
     register_setting('instagram_settings', 'instagram_client_secret');
 
-    $oauth_link = 'https://instagram.com/oauth/authorize/?';
+    $instagram = new Instagram(array(
+      'apiKey' => get_option('instagram_client_id'),
+      'apiSecret' => get_option('instagram_client_secret'),
+      'apiCallback' => home_url('/?callback=instagram_auth')
+    ));
 
-    $oauth_params = array(
-      'client_id' => get_option('instagram_client_id'),
-      'redirect_uri' => home_url('/?callback=instagram_auth'),
-      'response_type' => 'code'
-    );
-
-    $oauth_link .= http_build_query($oauth_params);
+    $oauth_link = $instagram->getLoginUrl();
 
     add_settings_field(
       'instagram_access_token',
