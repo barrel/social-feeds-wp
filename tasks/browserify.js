@@ -2,7 +2,6 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var shim = require('browserify-shim');
-var livereload = require('gulp-livereload');
 var fs = require('fs');
 var path = require('path');
 
@@ -55,10 +54,6 @@ function browserifyTask(dev, cb) {
       .on('error', function (err) { console.error(err.message); })
       .on('end', function() {
         bundleLogger.end(outputFile);
-
-        if(dev) {
-          livereload.changed(path.resolve(process.cwd(), bundleOpts.output));
-        }
 
         if(typeof cb !== 'undefined') {
           cb();
