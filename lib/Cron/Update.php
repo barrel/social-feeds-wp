@@ -2,6 +2,10 @@
 namespace Barrel\SocialFeeds\Cron;
 use MetzWeb\Instagram\Instagram;
 
+require_once(ABSPATH.'wp-admin/includes/media.php');
+require_once(ABSPATH.'wp-admin/includes/file.php');
+require_once(ABSPATH.'wp-admin/includes/image.php');
+
 /**
  * Pulls the latest social posts and saves them to custom post type.
  */
@@ -10,7 +14,7 @@ class Update {
   /**
    * Initializes the Instagram API and fetches the latest posts
    */
-  function __construct() {
+  function __construct($options = false) {
     $this->instagram = new Instagram(array(
       'apiKey' => get_option('instagram_client_id'),
       'apiSecret' => get_option('instagram_client_secret'),
@@ -23,44 +27,77 @@ class Update {
       $this->instagram->setAccessToken($token);
     }
 
+    if(isset($options['sync_start_date'])) {
+      $this->start_time = strtotime($options['sync_start_date']);
+    }
+
     $this->fetch_instagram();
+  }
+
+  function get_option_terms($option_name) {
+    $option_string = trim(get_option($option_name));
+
+    if(strpos($option_name, 'hashtag') !== false) {
+      $option_string = str_replace('#', '', $option_string);
+    }
+
+    if(!empty($option_string)) {
+      return explode(' ', $option_string);
+    } else {
+      return false;
+    }
+  }
+
+  function save_instagram_feed($feed, &$updated = array()) {
+    if(empty($feed->data)) {
+      return;
+    }
+    
+    foreach ($feed->data as $social_post) {
+      $created_time = (int) $social_post->created_time;
+
+      if($this->start_time === false || $created_time >= $this->start_time) {
+        $id = $this->update_social_post($social_post);
+        array_push($updated, $id);
+      }
+    }
+
+    $last_post_time = (int) $feed->data[(count($feed->data)-1)]->created_time;
+
+    if($last_post_time >= $this->start_time && $feed->pagination->next_url) {
+      $this->save_instagram_feed($this->instagram->pagination($feed), $updated);
+    }
   }
 
   /**
    * Fetches Instagram posts based on the provided usernames and hashtags
    */
   function fetch_instagram() {
-    $hashtag_string = trim(get_option('instagram_feed_hashtag'));
+    $updated_posts = array();
 
-    if(!empty($hashtag_string)) {
-      $hashtag_string = str_replace('#', '', $hashtag_string);
-      $tags = explode(' ', $hashtag_string);
+    $tags = $this->get_option_terms('instagram_feed_hashtag');
 
+    if($tags) {
       foreach ($tags as $tag) {
         $feed = $this->instagram->getTagMedia($tag, 30);
-        
-        foreach ($feed->data as $social_post) {
-          $this->update_social_post($social_post);
-        }
+
+        $this->save_instagram_feed($feed, $updated_posts);
       }
     }
 
-    $username_string = trim(get_option('instagram_feed_username'));
+    $usernames = $this->get_option_terms('instagram_feed_username');
 
-    if(!empty($username_string)) {
-      $usernames = explode(' ', $username_string);
-
-      foreach ($usernames as $name) {
-        $users = $this->instagram->searchUser($name, 1);
-        $user_id = $users->data[0]->id;
+    if($usernames) {
+      foreach ($usernames as $username) {
+        $user = $this->instagram->searchUser($username, 1);
+        $user_id = $user->data[0]->id;
         $feed = $this->instagram->getUserMedia($user_id, 30);
 
-        foreach ($feed->data as $social_post) {
-          $this->update_social_post($social_post);
-        }
+        $this->save_instagram_feed($feed, $updated_posts);
       }
     }
 
+    $this->updated = $updated_posts;
   }
 
   /**
@@ -98,6 +135,8 @@ class Update {
 
       set_post_thumbnail($id, $images[0]->ID);
     }
+
+    return $id;
   }
 
 }

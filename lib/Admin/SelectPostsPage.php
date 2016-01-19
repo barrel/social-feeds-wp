@@ -5,7 +5,7 @@ use Barrel\SocialFeeds\Cron\Update;
 /**
  * Creates the admin page for selecting posts to publish.
  */
-class SelectPosts extends AdminPage {
+class SelectPostsPage extends Page {
 
   static $page_title = 'Select Social Posts';
   static $menu_title = 'Select Posts';

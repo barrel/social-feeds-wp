@@ -35,6 +35,25 @@ class SocialFeeds {
       $this->retrieve_access_token();
     }
 
+    if(isset($_REQUEST['instagram_sync_now'])) {
+
+      $instagram_options = array('instagram_client_id', 'instagram_client_secret', 'instagram_access_token', 'instagram_feed_hashtag', 'instagram_feed_username');
+
+      foreach ($instagram_options as $option_name) {
+        if(isset($_REQUEST[$option_name])) {
+          update_option($option_name, $_REQUEST[$option_name]);
+        }
+      }
+
+      $update_now = new Cron\Update(array(
+        'sync_start_date' => $_REQUEST['instagram_sync_now']
+      ));
+
+      wp_send_json(array(
+        'updated' => $update_now->updated
+      ));
+    }
+
     /** Register the custom post type for social posts. */
     register_post_type('social-post', array(
       'labels' => array(
@@ -58,24 +77,35 @@ class SocialFeeds {
    */
   function init_admin() {
 
-    new Admin\SelectPosts;
-    new Admin\Settings;
+    new Admin\SelectPostsPage;
+    new Admin\SettingsPage;
 
     add_action('admin_enqueue_scripts', function($hook) {
-      wp_register_style(
-        'social-feeds-admin',
-        plugins_url('assets/css/social-feeds-admin.min.css', __FILE__),
-        false,
-        '1.0.0'
-      );
-      wp_enqueue_style('social-feeds-admin');
+      // if(strpos($hook, 'social-post') !== false) {
+        wp_register_style(
+          'social-feeds-admin',
+          plugins_url('assets/css/social-feeds-admin.min.css', __FILE__),
+          false,
+          '1.0.0'
+        );
+        wp_enqueue_style('social-feeds-admin');
 
-      wp_enqueue_script(
+        wp_enqueue_script(
+          'social-feeds-modernizr',
+          plugins_url('assets/js/social-feeds-modernizr.min.js', __FILE__)
+        );
+
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-datepicker' );
+        wp_enqueue_style('jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+
+        wp_enqueue_script(
         'social-feeds-admin',
-        plugins_url('assets/js/social-feeds-admin.min.js', __FILE__),
-        array('jquery'),
-        '1.0.0'
-      );
+          plugins_url('assets/js/social-feeds-admin.min.js', __FILE__),
+          array('jquery'),
+          '1.0.0'
+        );
+      // }
     });
 
   }

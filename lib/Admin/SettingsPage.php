@@ -5,7 +5,7 @@ use MetzWeb\Instagram\Instagram;
 /**
  * Creates the admin page for configuring plugin settings.
  */
-class Settings extends AdminPage {
+class SettingsPage extends Page {
 
   static $page_title = 'Social Feed Settings';
   static $menu_title = 'Feed Settings';
@@ -17,8 +17,8 @@ class Settings extends AdminPage {
     add_option('instagram_client_id', '');
     add_option('instagram_client_secret', '');
     add_option('instagram_access_token', '');
-    add_option('instagram_feed_hashtag', 'barrelny');
-    add_option('instagram_feed_username', 'barrelny');
+    add_option('instagram_feed_hashtag', '');
+    add_option('instagram_feed_username', '');
 
     add_settings_section(
       'instagram_settings',
@@ -91,13 +91,24 @@ class Settings extends AdminPage {
     );
 
     register_setting('instagram_settings', 'instagram_feed_username');
+
+    add_settings_field(
+      'sync_now',
+      'Sync Now',
+      array($this, 'render_sync_now_setting'),
+      self::$menu_slug,
+      'instagram_settings',
+      array()
+    );
+
+    register_setting('instagram_settings', 'sync_now');
   }
 
   function display_options_page() {
     ?>
     <div class="wrap">
       <h2><?= self::$page_title ?></h2>
-      <form action="options.php" method="post">
+      <form id="social_feeds_settings" action="options.php" method="post">
         <?php
         settings_fields( 'instagram_settings' );
         do_settings_sections( self::$menu_slug );
@@ -105,6 +116,12 @@ class Settings extends AdminPage {
         ?>
       </form>
     </div>
+    <?php
+  }
+
+  function render_sync_now_setting() {
+    ?>
+    <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" class="button" disabled>Sync Now</button></p>
     <?php
   }
 

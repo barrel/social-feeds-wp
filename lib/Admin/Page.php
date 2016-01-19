@@ -4,7 +4,7 @@ namespace Barrel\SocialFeeds\Admin;
 /**
  * Base admin page class, initializes common functionality for admin pages.
  */
-class AdminPage {
+class Page {
 
   static $page_title = 'Settings';
   static $menu_title = 'Settings';

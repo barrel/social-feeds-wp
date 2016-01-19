@@ -32,4 +32,10 @@
   .social-post-card input:checked ~ .social-post-details {
     background: green; }
 
+#ui-datepicker-div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1; }
+
 /*# sourceMappingURL=../../assets/css/social-feeds-admin.min.css.map */
