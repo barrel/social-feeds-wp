@@ -71,3 +71,14 @@
   left: 0;
   z-index: -1;
 }
+
+.social-feeds-spinner {
+  display: none;
+  vertical-align: middle;
+  margin-left: 5px;
+  margin-top: -2px;
+}
+
+.social-feeds-loading .social-feeds-spinner {
+  display: inline-block;
+}

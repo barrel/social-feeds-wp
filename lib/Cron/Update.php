@@ -31,6 +31,10 @@ class Update {
       $this->start_time = strtotime($options['sync_start_date']);
     }
 
+    if(isset($options['sync_update'])) {
+      $this->sync_update = $options['sync_update'];
+    }
+
     $this->fetch_instagram();
   }
 
@@ -111,29 +115,49 @@ class Update {
       'meta_value' => $social_post->link
     ));
 
-    if(!empty($existing)) {
-      $id = $existing[0]->ID;
-    } else {
+    $update_details = false;
+
+    if(empty($existing)) {
+      // Create the post, saving caption to title
       $id = wp_insert_post(array(
         'post_type' => 'social-post',
         'post_title' => $social_post->caption->text
       ));
 
-      update_post_meta($id, 'social_post_username', $social_post->user->username);
+      // Save the unique identifier (permalink) and media to post
+
       update_post_meta($id, 'social_post_permalink', $social_post->link);
       update_post_meta($id, 'social_post_image', $social_post->images->standard_resolution->url);
-      update_post_meta($id, 'social_post_created', $social_post->created_time);
-      update_post_meta($id, 'social_post_details', json_encode($social_post));
 
       if(isset($social_post->videos)) {
         update_post_meta($id, 'social_post_video', $social_post->videos->standard_resolution->url);
       }
 
       media_sideload_image($social_post->images->standard_resolution->url, $id);
-
       $images = array_values(get_attached_media('image', $id));
-
       set_post_thumbnail($id, $images[0]->ID);
+
+      $update_details = true;
+    } else {
+      // Find existing post.
+      $id = $existing[0]->ID;
+
+      if($this->sync_update) {
+        $update_details = true;
+
+        // Update title of existing post
+        wp_update_post(array(
+          'ID' => $id,
+          'post_title' => $social_post->caption->text
+        ));
+      }
+    }
+
+    // Update details for new posts (or archived posts if sync_update is set).
+    if($update_details) {
+      update_post_meta($id, 'social_post_username', $social_post->user->username);
+      update_post_meta($id, 'social_post_created', $social_post->created_time);
+      update_post_meta($id, 'social_post_details', json_encode($social_post));
     }
 
     return $id;

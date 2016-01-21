@@ -28,7 +28,8 @@ class SelectPostsPage extends Page {
   }
 
   function display_options_page() {
-    new Update();
+    // Update on admin page load?
+    // new Update();
 
     $social_post_query = new \WP_Query(array(
       'post_type' => 'social-post',

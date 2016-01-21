@@ -16,7 +16,7 @@ $(function() {
     } else {
       $syncButton.removeAttr('disabled');
     }
-  });
+  }).trigger('change');
 
   $syncButton.on('click', function(event) {
     var formData = $form.serializeArray();
@@ -25,6 +25,10 @@ $(function() {
       'name': 'instagram_sync_now',
       'value': $startDate.val()
     });
+
+    $form.addClass('social-feeds-loading');
+    $syncButton.attr('disabled', 'disabled').text('Syncing...');
+    $startDate.off('change');
 
     $.ajax({
       type: 'POST',
@@ -36,11 +40,12 @@ $(function() {
           $syncButton.text('Sync Finished');
         }
       },
-      error: function(data) {
+      error: function() {
         $syncButton.text('Sync Failed');
+      },
+      complete: function() {
+        $form.removeClass('social-feeds-loading');
       }
     });
-
-    $syncButton.attr('disabled', 'disabled').text('Syncing...');
   });
 });

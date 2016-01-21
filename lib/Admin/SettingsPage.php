@@ -76,7 +76,7 @@ class SettingsPage extends Page {
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',
-      array('instagram_feed_hashtag', 'Enter one or more tags separated with spaces. (Optional)')
+      array('instagram_feed_hashtag', '<em>Enter one or more tags separated with spaces. (Optional)</em>')
     );
 
     register_setting('instagram_settings', 'instagram_feed_hashtag');
@@ -87,7 +87,7 @@ class SettingsPage extends Page {
       array($this, 'render_text_setting'),
       self::$menu_slug,
       'instagram_settings',
-      array('instagram_feed_username', 'Enter one or more usernames separated with spaces. (Optional)')
+      array('instagram_feed_username', '<em>Enter one or more usernames separated with spaces. (Optional)</em>')
     );
 
     register_setting('instagram_settings', 'instagram_feed_username');
@@ -121,7 +121,8 @@ class SettingsPage extends Page {
 
   function render_sync_now_setting() {
     ?>
-    <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" class="button" disabled>Sync Now</button></p>
+    <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
+    <p><label><input type="checkbox" name="instagram_sync_update"> Update details for existing posts.</label></p>
     <?php
   }
 

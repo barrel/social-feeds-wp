@@ -45,12 +45,13 @@ class SocialFeeds {
         }
       }
 
-      $update_now = new Cron\Update(array(
-        'sync_start_date' => $_REQUEST['instagram_sync_now']
+      $sync_now = new Cron\Update(array(
+        'sync_start_date' => $_REQUEST['instagram_sync_now'],
+        'sync_update' => @$_REQUEST['instagram_sync_update']
       ));
 
       wp_send_json(array(
-        'updated' => $update_now->updated
+        'updated' => $sync_now->updated
       ));
     }
 
