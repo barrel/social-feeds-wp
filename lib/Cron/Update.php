@@ -68,8 +68,8 @@ class Update {
 
     $last_post_time = (int) $feed->data[(count($feed->data)-1)]->created_time;
 
-    if($last_post_time >= $this->start_time && $feed->pagination->next_url) {
-      $this->save_instagram_feed($this->instagram->pagination($feed), $updated);
+    if($last_post_time >= $this->start_time && @$feed->pagination->next_url) {
+      $this->save_instagram_feed($this->instagram->pagination($feed, 30), $updated);
     }
   }
 
@@ -142,7 +142,7 @@ class Update {
       // Find existing post.
       $id = $existing[0]->ID;
 
-      if($this->sync_update) {
+      if(@$this->sync_update) {
         $update_details = true;
 
         // Update title of existing post
