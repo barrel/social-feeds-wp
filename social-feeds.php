@@ -82,31 +82,74 @@ class SocialFeeds {
     new Admin\SettingsPage;
 
     add_action('admin_enqueue_scripts', function($hook) {
-      // if(strpos($hook, 'social-post') !== false) {
-        wp_register_style(
-          'social-feeds-admin',
-          plugins_url('assets/css/social-feeds-admin.min.css', __FILE__),
-          false,
-          '1.0.0'
-        );
-        wp_enqueue_style('social-feeds-admin');
-
-        wp_enqueue_script(
-          'social-feeds-modernizr',
-          plugins_url('assets/js/social-feeds-modernizr.min.js', __FILE__)
-        );
-
-        wp_enqueue_script('jquery-ui-core');
-        wp_enqueue_script('jquery-ui-datepicker' );
-        wp_enqueue_style('jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
-
-        wp_enqueue_script(
+      wp_register_style(
         'social-feeds-admin',
-          plugins_url('assets/js/social-feeds-admin.min.js', __FILE__),
-          array('jquery'),
-          '1.0.0'
+        plugins_url('assets/css/social-feeds-admin.min.css', __FILE__),
+        false,
+        '1.0.0'
+      );
+      wp_enqueue_style('social-feeds-admin');
+
+      wp_enqueue_script(
+        'social-feeds-modernizr',
+        plugins_url('assets/js/social-feeds-modernizr.min.js', __FILE__)
+      );
+
+      wp_enqueue_script('jquery-ui-core');
+      wp_enqueue_script('jquery-ui-datepicker' );
+      wp_enqueue_style('jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+
+      wp_enqueue_script(
+      'social-feeds-admin',
+        plugins_url('assets/js/social-feeds-admin.min.js', __FILE__),
+        array('jquery'),
+        '1.0.0'
+      );
+    });
+
+    add_filter('manage_social-post_posts_columns', function($columns) {
+      return array_slice($columns, 0, 1) +
+        array('thumbnail' => '') +
+        array_slice($columns, 1, count($columns)-2) +
+        array(
+          'date' => 'Date',
+          'date-created' => 'Date Created'
         );
-      // }
+    });
+
+    add_filter('manage_edit-social-post_sortable_columns', function($columns) {
+      $columns['date-created'] = 'date_created';
+      return $columns;
+    });
+
+    add_action('manage_social-post_posts_custom_column', function($column_name, $post_id) {
+      if($column_name == 'thumbnail') {
+        the_post_thumbnail('thumbnail');
+      } else if($column_name == 'date-created') {
+        $created = (int) get_post_meta($post_id, 'social_post_created', true);
+        $timezone = (int) get_option('gmt_offset');
+        $offset = $timezone * 60 * 60;
+        $created += $offset;
+        echo 'Posted<br>';
+        echo date('Y/m/d g:i:s a', $created);
+      }
+    }, 10, 2);
+
+    add_action('pre_get_posts', function( $query ) {
+      if(!is_admin()) {
+        return;
+      }
+
+      $post_type = $query->get('post_type');
+
+      if($post_type === 'social-post') {
+        $orderby = $query->get( 'orderby');
+
+        if(empty($orderby) || $orderby === 'date_created') {
+          $query->set('meta_key', 'social_post_created');
+          $query->set('orderby', 'meta_value_num');
+        }
+      }
     });
 
   }

@@ -82,3 +82,31 @@
 .social-feeds-loading .social-feeds-spinner {
   display: inline-block;
 }
+
+.wp-admin.post-type-social-post .column-thumbnail {
+  @media (min-width: 783px) {
+    width: 100px;
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  @media (max-width: 782px) {
+    display: none !important;
+    
+    &:before {
+      content: none !important;
+    }
+
+    img {
+      width: 100px;
+      height: auto;
+    }
+  }
+}
+
+.wp-admin.post-type-social-post .column-date-created {
+  width: 10%;
+}

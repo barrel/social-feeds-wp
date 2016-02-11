@@ -47,4 +47,23 @@
 .social-feeds-loading .social-feeds-spinner {
   display: inline-block; }
 
+@media (min-width: 783px) {
+  .wp-admin.post-type-social-post .column-thumbnail {
+    width: 100px; }
+    .wp-admin.post-type-social-post .column-thumbnail img {
+      width: 100%;
+      height: auto; } }
+
+@media (max-width: 782px) {
+  .wp-admin.post-type-social-post .column-thumbnail {
+    display: none !important; }
+    .wp-admin.post-type-social-post .column-thumbnail:before {
+      content: none !important; }
+    .wp-admin.post-type-social-post .column-thumbnail img {
+      width: 100px;
+      height: auto; } }
+
+.wp-admin.post-type-social-post .column-date-created {
+  width: 10%; }
+
 /*# sourceMappingURL=../../assets/css/social-feeds-admin.min.css.map */
