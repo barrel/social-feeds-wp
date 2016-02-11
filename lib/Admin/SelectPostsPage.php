@@ -20,13 +20,6 @@ class SelectPostsPage extends Page {
     add_action('admin_post_curate_social_feed', array($this, 'curate_feed'));
   }
 
-  function add_options_page() {
-    parent::add_options_page();
-
-    // remove_submenu_page(self::$parent_slug, self::$parent_slug);
-    remove_submenu_page(self::$parent_slug, 'post-new.php?post_type=social-post');
-  }
-
   function display_options_page() {
     // Update on admin page load?
     // new Update();
@@ -61,7 +54,7 @@ class SelectPostsPage extends Page {
                   <div class="social-post-details">
                     <?php the_post_thumbnail('thumbnail'); ?>
                     <p><?= $item_content ?></p>
-                    <p class="user"><?= $item_user ?></p>
+                    <p class="user">@<?= $item_user ?></p>
                   </div>
                 </label>
                 <?php

@@ -13,6 +13,11 @@ class SettingsPage extends Page {
   static $capability = 'manage_options';
   static $menu_slug = 'feed-settings';
 
+  function add_options_page() {
+    parent::add_options_page();
+    remove_submenu_page(self::$parent_slug, 'post-new.php?post_type=social-post');
+  }
+
   function initialize_options() {
     add_option('instagram_client_id', '');
     add_option('instagram_client_secret', '');
@@ -122,7 +127,7 @@ class SettingsPage extends Page {
   function render_sync_now_setting() {
     ?>
     <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
-    <p><label><input type="checkbox" name="instagram_sync_update"> Update details for existing posts.</label></p>
+    <p><label><input type="checkbox" name="instagram_sync_update"> Update details for existing posts</label></p>
     <?php
   }
 
