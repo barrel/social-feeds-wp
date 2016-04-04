@@ -5,13 +5,13 @@ use MetzWeb\Instagram\Instagram;
 /**
  * Creates the admin page for configuring plugin settings.
  */
-class SettingsPage extends Page {
+class InstagramSettingsPage extends Page {
 
-  static $page_title = 'Social Feed Settings';
-  static $menu_title = 'Feed Settings';
+  static $page_title = 'Instagram Settings';
+  static $menu_title = 'Instagram Settings';
   static $parent_slug = 'edit.php?post_type=social-post';
   static $capability = 'manage_options';
-  static $menu_slug = 'feed-settings';
+  static $menu_slug = 'instagram-settings';
 
   function add_options_page() {
     parent::add_options_page();
@@ -126,7 +126,7 @@ class SettingsPage extends Page {
 
   function render_sync_now_setting() {
     ?>
-    <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
+    <p>Sync all posts since <input type="date" name="instagram_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="instagram_sync_now_button" data-network="twitter" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
     <p><label><input type="checkbox" name="instagram_sync_update"> Update details for existing posts</label></p>
     <?php
   }

@@ -1,6 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
-use Barrel\SocialFeeds\Cron\Update;
+use Barrel\SocialFeeds\Update\InstagramFeed;
 
 /**
  * Creates the admin page for selecting posts to publish.
@@ -22,7 +22,7 @@ class SelectPostsPage extends Page {
 
   function display_options_page() {
     // Update on admin page load?
-    // new Update();
+    // new InstagramFeed();
 
     $social_post_query = new \WP_Query(array(
       'post_type' => 'social-post',

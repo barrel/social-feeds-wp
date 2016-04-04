@@ -2,8 +2,8 @@ var $ = require('jquery');
 
 $(function() {
   var $form = $('#social_feeds_settings');
-  var $startDate = $form.find('input[name="instagram_sync_start"]');
-  var $syncButton =  $form.find('button[name="instagram_sync_now_button"]');
+  var $startDate = $form.find('input[name*="sync_start"]');
+  var $syncButton =  $form.find('button[name*="sync_now_button"]');
 
 
   if(!Modernizr.inputtypes.date) {
@@ -21,8 +21,10 @@ $(function() {
   $syncButton.on('click', function(event) {
     var formData = $form.serializeArray();
 
+    var name = $syncButton.attr('data-network')+'_sync_now';
+
     formData.push({
-      'name': 'instagram_sync_now',
+      'name': name,
       'value': $startDate.val()
     });
 

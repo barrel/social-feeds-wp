@@ -45,9 +45,27 @@ class SocialFeeds {
         }
       }
 
-      $sync_now = new Cron\Update(array(
+      $sync_now = new Update\InstagramFeed(array(
         'sync_start_date' => $_REQUEST['instagram_sync_now'],
         'sync_update' => @$_REQUEST['instagram_sync_update']
+      ));
+
+      wp_send_json(array(
+        'updated' => $sync_now->updated
+      ));
+    } else if(isset($_REQUEST['twitter_sync_now'])) {
+
+      $twitter_options = array('twitter_consumer_key', 'twitter_consumer_secret', 'twitter_access_token', 'twitter_access_token_secret', 'twitter_feed_hashtag', 'twitter_feed_username');
+
+      foreach ($twitter_options as $option_name) {
+        if(isset($_REQUEST[$option_name])) {
+          update_option($option_name, $_REQUEST[$option_name]);
+        }
+      }
+
+      $sync_now = new Update\TwitterFeed(array(
+        'sync_start_date' => $_REQUEST['twitter_sync_now'],
+        'sync_update' => @$_REQUEST['twitter_sync_update']
       ));
 
       wp_send_json(array(
@@ -79,7 +97,8 @@ class SocialFeeds {
   function init_admin() {
 
     new Admin\SelectPostsPage;
-    new Admin\SettingsPage;
+    new Admin\InstagramSettingsPage;
+    new Admin\TwitterSettingsPage;
 
     add_action('admin_enqueue_scripts', function($hook) {
       wp_register_style(
