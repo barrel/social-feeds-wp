@@ -11,8 +11,6 @@ require_once(ABSPATH.'wp-admin/includes/image.php');
  */
 class Feed {
 
-  public static $network = '';
-
   function __construct($options = array()) {
     if(isset($options['sync_start_date'])) {
       $this->start_time = strtotime($options['sync_start_date']);
@@ -37,7 +35,7 @@ class Feed {
     }
     
     foreach ($results as $social_post) {
-      $post_info = $this->parse_social_post(static::$network, $social_post);
+      $post_info = $this->parse($social_post);
 
       if(@$this->start_time === false || $post_info['created'] >= $this->start_time) {
         $id = $this->update_social_post($post_info);
@@ -71,28 +69,8 @@ class Feed {
   /**
    * Parse common fields out of the API response for a social network post
    */
-  function parse_social_post($network, $social_post) {
-    if($network === 'twitter') {
-      return array(
-        'permalink' => 'https://twitter.com/'.$social_post['user']['screen_name'].'/status/'.$social_post['id'],
-        'text' => $social_post['text'],
-        'image' => false,
-        'video' => false,
-        'username' => $social_post['user']['screen_name'],
-        'created' => strtotime($social_post['created_at']),
-        'details' => json_encode($social_post)
-      );
-    } else if($network === 'instagram') {
-      return array(
-        'permalink' => $social_post->link,
-        'text' => $social_post->caption->text,
-        'image' => $social_post->images->standard_resolution->url,
-        'video' => @$social_post->videos->standard_resolution->url,
-        'username' => $social_post->user->username,
-        'created' => $social_post->created_time,
-        'details' => json_encode($social_post)
-      );
-    }
+  function parse($social_post) {
+    return false;
   }
 
   /**

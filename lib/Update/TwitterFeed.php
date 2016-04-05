@@ -25,7 +25,7 @@ class TwitterFeed extends Feed {
   }
 
   /**
-   * Fetches Instagram posts based on the provided usernames and hashtags
+   * Fetches Twitter posts based on the provided usernames and hashtags
    */
   function fetch() {
     $updated_posts = array();
@@ -49,6 +49,18 @@ class TwitterFeed extends Feed {
     }
 
     $this->updated = $updated_posts;
+  }
+
+  function parse($social_post) {
+    return array(
+      'permalink' => 'https://twitter.com/'.$social_post['user']['screen_name'].'/status/'.$social_post['id'],
+      'text' => $social_post['text'],
+      'image' => false,
+      'video' => false,
+      'username' => $social_post['user']['screen_name'],
+      'created' => strtotime($social_post['created_at']),
+      'details' => json_encode($social_post)
+    );
   }
 
 }

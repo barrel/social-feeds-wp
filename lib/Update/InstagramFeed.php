@@ -61,4 +61,16 @@ class InstagramFeed extends Feed {
     $this->updated = $updated_posts;
   }
 
+  function parse($social_post) {
+    return array(
+      'permalink' => $social_post->link,
+      'text' => $social_post->caption->text,
+      'image' => $social_post->images->standard_resolution->url,
+      'video' => @$social_post->videos->standard_resolution->url,
+      'username' => $social_post->user->username,
+      'created' => $social_post->created_time,
+      'details' => json_encode($social_post)
+    );
+  }
+
 }

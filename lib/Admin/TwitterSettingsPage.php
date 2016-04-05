@@ -7,11 +7,8 @@ use MetzWeb\Instagram\Instagram;
  */
 class TwitterSettingsPage extends Page {
 
-  static $network = 'twitter';
-
   static $page_title = 'Twitter Settings';
   static $menu_title = 'Twitter Settings';
-  static $parent_slug = 'edit.php?post_type=social-post';
   static $capability = 'manage_options';
   static $menu_slug = 'twitter-settings';
   static $settings_section = 'twitter_settings';
@@ -46,6 +43,7 @@ class TwitterSettingsPage extends Page {
     'sync_now' => array(
       'type' => 'sync_now',
       'title' => 'Sync Now',
+      'args' => array('twitter')
     )
   );
 

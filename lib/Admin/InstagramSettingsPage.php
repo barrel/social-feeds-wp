@@ -7,11 +7,8 @@ use MetzWeb\Instagram\Instagram;
  */
 class InstagramSettingsPage extends Page {
 
-  static $network = 'instagram';
-
   static $page_title = 'Instagram Settings';
   static $menu_title = 'Instagram Settings';
-  static $parent_slug = 'edit.php?post_type=social-post';
   static $capability = 'manage_options';
   static $menu_slug = 'instagram-settings';
   static $settings_section = 'instagram_settings';
@@ -42,6 +39,7 @@ class InstagramSettingsPage extends Page {
     'sync_now' => array(
       'type' => 'sync_now',
       'title' => 'Sync Now',
+      'args' => array('instagram')
     )
   );
 

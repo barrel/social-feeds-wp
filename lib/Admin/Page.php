@@ -8,13 +8,11 @@ class Page {
 
   static $page_title = 'Settings';
   static $menu_title = 'Settings';
-  static $parent_slug = 'edit.php?post_type=social-post';
   static $capability = 'manage_options';
   static $menu_slug = 'settings';
 
   static $settings = false;
   static $settings_section = false;
-  static $network = false;
 
   function __construct() {
     add_action('admin_init', array($this, 'initialize_options'));
@@ -63,7 +61,7 @@ class Page {
    */
   function add_options_page() {
     add_submenu_page(
-      static::$parent_slug,
+      'edit.php?post_type=social-post',
       static::$page_title,
       static::$menu_title,
       static::$capability,
@@ -107,10 +105,11 @@ class Page {
     }
   }
 
-  function render_sync_now_setting() {
+  function render_sync_now_setting($args) {
+    $network = $args[1];
     ?>
-    <p>Sync all posts since <input type="date" name="<?= static::$network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= static::$network ?>_sync_now_button" data-network="twitter" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
-    <p><label><input type="checkbox" name="<?= static::$network ?>_sync_update"> Update details for existing posts</label></p>
+    <p>Sync all posts since <input type="date" name="<?= $network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= $network ?>_sync_now_button" data-network="twitter" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
+    <p><label><input type="checkbox" name="<?= $network ?>_sync_update"> Update details for existing posts</label></p>
     <?php
   }
 
