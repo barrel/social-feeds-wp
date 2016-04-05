@@ -16,6 +16,7 @@ require('vendor/autoload.php');
 class SocialFeeds {
 
   static $options = array();
+  static $is_plugin = false;
 
   function __construct($options = array()) {
 
@@ -116,9 +117,24 @@ class SocialFeeds {
     });
 
     add_action('admin_enqueue_scripts', function($hook) {
+      if(self::$is_plugin) {
+        $admin_css_uri = plugins_url('assets/css/social-feeds-admin.min.css', __FILE__);
+        $admin_modernizr_uri = plugins_url('assets/js/social-feeds-modernizr.min.js', __FILE__);
+        $admin_js_uri = plugins_url('assets/js/social-feeds-admin.min.js', __FILE__);
+      } else {
+        $theme_path = get_template_directory();
+        $file_path = __FILE__;
+        $dir = dirname(substr($file_path, strlen($theme_path)));
+        $theme_uri = get_template_directory_uri();
+
+        $admin_css_uri = $theme_uri.$dir.'/assets/css/social-feeds-admin.min.css';
+        $admin_modernizr_uri = $theme_uri.$dir.'/assets/js/social-feeds-modernizr.min.js';
+        $admin_js_uri = $theme_uri.$dir.'/assets/js/social-feeds-admin.min.js';
+      }
+
       wp_register_style(
         'social-feeds-admin',
-        plugins_url('assets/css/social-feeds-admin.min.css', __FILE__),
+        $admin_css_uri,
         false,
         '1.0.0'
       );
@@ -126,7 +142,7 @@ class SocialFeeds {
 
       wp_enqueue_script(
         'social-feeds-modernizr',
-        plugins_url('assets/js/social-feeds-modernizr.min.js', __FILE__)
+        $admin_modernizr_uri
       );
 
       wp_enqueue_script('jquery-ui-core');
@@ -135,7 +151,7 @@ class SocialFeeds {
 
       wp_enqueue_script(
       'social-feeds-admin',
-        plugins_url('assets/js/social-feeds-admin.min.js', __FILE__),
+        $admin_js_uri,
         array('jquery'),
         '1.0.0'
       );
@@ -215,5 +231,6 @@ class SocialFeeds {
 
 /** Instantiate automatically when installed as a plugin. */
 if(strpos(__FILE__, 'wp-content/plugins') !== false) {
+  SocialFeeds::$is_plugin = true;
   new SocialFeeds;
 }
