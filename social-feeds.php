@@ -15,12 +15,28 @@ require('vendor/autoload.php');
  */
 class SocialFeeds {
 
+  static $options = array();
+
   function __construct($options = array()) {
 
     add_action('init', array($this, 'init'));
 
     if(is_admin()) {
       $this->init_admin();
+    }
+
+    if(!empty($options)) {
+      $settings = array_merge(
+        array_keys(Admin\InstagramSettingsPage::$settings),
+        array_keys(Admin\TwitterSettingsPage::$settings)
+      );
+
+      foreach ($options as $key => $val) {
+        if(in_array($key, $settings)) {
+          self::$options[$key] = $val;
+          update_option($key, $val);
+        }
+      }
     }
 
   }

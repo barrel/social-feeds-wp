@@ -40,6 +40,10 @@ class Page {
           add_option($id, '');
         }
 
+        if(isset(\Barrel\SocialFeeds\SocialFeeds::$options[$id])) {
+          continue;
+        }
+
         $args = array_merge(array($id), (@$setting['args'] ?: array()));
 
         add_settings_field(
