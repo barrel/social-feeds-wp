@@ -1,5 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
+use Barrel\SocialFeeds\SocialFeeds;
 use MetzWeb\Instagram\Instagram;
 
 /**
@@ -46,5 +47,11 @@ class TwitterSettingsPage extends Page {
       'args' => array('twitter')
     )
   );
+
+  function add_options_page() {
+    if(!isset(SocialFeeds::$options['enable_twitter']) || SocialFeeds::$options['enable_twitter'] === true) {
+      parent::add_options_page();
+    }
+  }
 
 }

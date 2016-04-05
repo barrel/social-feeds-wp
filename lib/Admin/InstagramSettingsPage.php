@@ -1,5 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
+use Barrel\SocialFeeds\SocialFeeds;
 use MetzWeb\Instagram\Instagram;
 
 /**
@@ -54,6 +55,12 @@ class InstagramSettingsPage extends Page {
     $oauth_url = $this->instagram->getLoginUrl();
     $oauth_link = '<a href="'.$oauth_url.'">Generate Access Token</a>';
     self::$settings['instagram_access_token']['args'] = array($oauth_link);
+  }
+
+  function add_options_page() {
+    if(!isset(SocialFeeds::$options['enable_instagram']) || SocialFeeds::$options['enable_instagram'] === true) {
+      parent::add_options_page();
+    }
   }
 
 }

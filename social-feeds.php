@@ -32,8 +32,9 @@ class SocialFeeds {
       );
 
       foreach ($options as $key => $val) {
+        self::$options[$key] = $val;
+
         if(in_array($key, $settings)) {
-          self::$options[$key] = $val;
           update_option($key, $val);
         }
       }
