@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fd818831d26a18f7ff345aec9dacaa29",
-    "content-hash": "50c695aff8f4ceb0fdaef09c11cd7853",
+    "hash": "71b8178b8796edb89f9de81ee95c6ed0",
+    "content-hash": "87b5154897c7914e43b273962c3e3d4c",
     "packages": [
         {
             "name": "abraham/twitteroauth",
-            "version": "0.6.2",
+            "version": "0.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/abraham/twitteroauth.git",
-                "reference": "d4fc4a3c36f5ecdfc8865ab1e7cefc432e49491c"
+                "reference": "6bcc5e866423e499a962a00a06df07da880c0c1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/abraham/twitteroauth/zipball/d4fc4a3c36f5ecdfc8865ab1e7cefc432e49491c",
-                "reference": "d4fc4a3c36f5ecdfc8865ab1e7cefc432e49491c",
+                "url": "https://api.github.com/repos/abraham/twitteroauth/zipball/6bcc5e866423e499a962a00a06df07da880c0c1c",
+                "reference": "6bcc5e866423e499a962a00a06df07da880c0c1c",
                 "shasum": ""
             },
             "require": {
@@ -26,8 +26,8 @@
                 "php": ">=5.5.0"
             },
             "require-dev": {
-                "phpmd/phpmd": "2.2.*",
-                "phpunit/phpunit": "4.7.*",
+                "phpmd/phpmd": "2.3.*",
+                "phpunit/phpunit": "4.8.*",
                 "squizlabs/php_codesniffer": "2.3.*"
             },
             "type": "library",
@@ -59,7 +59,7 @@
                 "social",
                 "twitter"
             ],
-            "time": "2015-11-05 04:04:20"
+            "time": "2016-03-30 11:14:45"
         },
         {
             "name": "cosenary/instagram",
@@ -151,6 +151,57 @@
                 "twitter"
             ],
             "time": "2015-08-03 21:35:18"
+        },
+        {
+            "name": "misd/linkify",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/misd-service-development/php-linkify.git",
+                "reference": "4dbe3e9f966e446a257d0f60a91f39e0b7f4f4d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/misd-service-development/php-linkify/zipball/4dbe3e9f966e446a257d0f60a91f39e0b7f4f4d6",
+                "reference": "4dbe3e9f966e446a257d0f60a91f39e0b7f4f4d6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Misd\\Linkify\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Wilkinson",
+                    "email": "chris.wilkinson@admin.cam.ac.uk"
+                }
+            ],
+            "description": "Converts URLs and email addresses in text into HTML links",
+            "homepage": "https://github.com/misd-service-development/php-linkify",
+            "keywords": [
+                "convert",
+                "email address",
+                "link",
+                "url"
+            ],
+            "time": "2014-05-12 11:52:18"
         }
     ],
     "packages-dev": [],

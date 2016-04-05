@@ -7,10 +7,14 @@ use MetzWeb\Instagram\Instagram;
  */
 class InstagramFeed extends Feed {
 
+  public static $network = 'instagram';
+
   /**
    * Initializes the Instagram API and fetches the latest posts
    */
   function __construct($options = false) {
+    parent::__construct($options);
+
     $this->instagram = new Instagram(array(
       'apiKey' => get_option('instagram_client_id'),
       'apiSecret' => get_option('instagram_client_secret'),
@@ -21,14 +25,6 @@ class InstagramFeed extends Feed {
 
     if(!empty($token)) {
       $this->instagram->setAccessToken($token);
-    }
-
-    if(isset($options['sync_start_date'])) {
-      $this->start_time = strtotime($options['sync_start_date']);
-    }
-
-    if(isset($options['sync_update'])) {
-      $this->sync_update = $options['sync_update'];
     }
 
     $this->fetch();
@@ -63,28 +59,6 @@ class InstagramFeed extends Feed {
     }
 
     $this->updated = $updated_posts;
-  }
-
-  function save($feed, &$updated = array()) {
-    if(empty($feed->data)) {
-      return;
-    }
-    
-    foreach ($feed->data as $social_post) {
-      $created_time = (int) $social_post->created_time;
-
-      if($this->start_time === false || $created_time >= $this->start_time) {
-        $post_info = $this->parse_social_post('instagram', $social_post);
-        $id = $this->update_social_post($post_info);
-        array_push($updated, $id);
-      }
-    }
-
-    $last_post_time = (int) $feed->data[(count($feed->data)-1)]->created_time;
-
-    if($last_post_time >= $this->start_time && @$feed->pagination->next_url) {
-      $this->save($this->instagram->pagination($feed, 30), $updated);
-    }
   }
 
 }

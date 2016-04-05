@@ -15,7 +15,7 @@ require('vendor/autoload.php');
  */
 class SocialFeeds {
 
-  function __construct() {
+  function __construct($options = array()) {
 
     add_action('init', array($this, 'init'));
 
@@ -36,7 +36,7 @@ class SocialFeeds {
     }
 
     if(isset($_REQUEST['instagram_sync_now'])) {
-      foreach (InstagramSettingsPage::$settings as $id => $setting) {
+      foreach (Admin\InstagramSettingsPage::$settings as $id => $setting) {
         if(isset($_REQUEST[$id])) {
           update_option($id, $_REQUEST[$id]);
         }
@@ -51,7 +51,7 @@ class SocialFeeds {
         'updated' => $sync_now->updated
       ));
     } else if(isset($_REQUEST['twitter_sync_now'])) {
-      foreach (TwitterSettingsPage::$settings as $id => $setting) {
+      foreach (Admin\TwitterSettingsPage::$settings as $id => $setting) {
         if(isset($_REQUEST[$id])) {
           update_option($id, $_REQUEST[$id]);
         }
@@ -80,7 +80,7 @@ class SocialFeeds {
       'show_in_menu' => true,
       'show_in_admin_bar' => false,
       'menu_icon' => 'dashicons-thumbs-up',
-      'supports' => array('title', 'thumbnail', 'custom-fields')
+      'supports' => array('title', 'editor', 'thumbnail', 'custom-fields')
     ));
 
   }
@@ -196,5 +196,7 @@ class SocialFeeds {
 
 }
 
-/** Instantiate the plugin class. */
-new SocialFeeds;
+/** Instantiate automatically when installed as a plugin. */
+if(strpos(__FILE__, 'wp-content/plugins') !== false) {
+  new SocialFeeds;
+}

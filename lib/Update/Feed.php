@@ -1,5 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Update;
+use Misd\Linkify\Linkify;
 
 require_once(ABSPATH.'wp-admin/includes/media.php');
 require_once(ABSPATH.'wp-admin/includes/file.php');
@@ -10,13 +11,46 @@ require_once(ABSPATH.'wp-admin/includes/image.php');
  */
 class Feed {
 
-  function __construct() {
+  public static $network = '';
+
+  function __construct($options = array()) {
     if(isset($options['sync_start_date'])) {
       $this->start_time = strtotime($options['sync_start_date']);
     }
 
     if(isset($options['sync_update'])) {
       $this->sync_update = $options['sync_update'];
+    }
+
+    $this->linkify = new Linkify();
+  }
+
+  function save($feed, &$updated = array()) {
+    if(static::$network === 'instagram') {
+      $results = $feed->data;
+    } else {
+      $results = $feed;
+    }
+
+    if(empty($results)) {
+      return;
+    }
+    
+    foreach ($results as $social_post) {
+      $post_info = $this->parse_social_post(static::$network, $social_post);
+
+      if(@$this->start_time === false || $post_info['created'] >= $this->start_time) {
+        $id = $this->update_social_post($post_info);
+        array_push($updated, $id);
+      }
+    }
+
+    if(static::$network === 'instagram') {
+      $last_post_time = (int) $results[(count($results)-1)]->created_time;
+
+      if($last_post_time >= $this->start_time && @$feed->pagination->next_url) {
+        $this->save($this->instagram->pagination($feed, 30), $updated);
+      }
     }
   }
 
@@ -39,9 +73,8 @@ class Feed {
    */
   function parse_social_post($network, $social_post) {
     if($network === 'twitter') {
-      $url = 'https://twitter.com/'.$social_post['user']['screen_name'].'\/status\/'.$social_post['id'];
       return array(
-        'permalink' => $url,
+        'permalink' => 'https://twitter.com/'.$social_post['user']['screen_name'].'/status/'.$social_post['id'],
         'text' => $social_post['text'],
         'image' => false,
         'video' => false,
@@ -66,6 +99,9 @@ class Feed {
    * Handles a social API response by adding or updating posts in custom post type.
    */
   function update_social_post($post_info) {
+    $title = $post_info['text'];
+    $content = $this->linkify->process($post_info['text']);
+
     $existing = get_posts(array(
       'post_type' => 'social-post',
       'post_status' => 'any',
@@ -81,7 +117,8 @@ class Feed {
       // Create the post, saving caption to title
       $id = wp_insert_post(array(
         'post_type' => 'social-post',
-        'post_title' => $post_info['text']
+        'post_title' => $title,
+        'post_content' => $content
       ));
 
       // Save the unique identifier (permalink) and media to post
@@ -108,7 +145,8 @@ class Feed {
         // Update title of existing post
         wp_update_post(array(
           'ID' => $id,
-          'post_title' => $post_info['text']
+          'post_title' => $title,
+          'post_content' => $content
         ));
       }
     }
