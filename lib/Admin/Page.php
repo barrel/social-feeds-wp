@@ -12,6 +12,10 @@ class Page {
   static $capability = 'manage_options';
   static $menu_slug = 'settings';
 
+  static $settings = false;
+  static $settings_section = false;
+  static $network = false;
+
   function __construct() {
     add_action('admin_init', array($this, 'initialize_options'));
     add_action('admin_menu', array($this, 'add_options_page'));
@@ -21,7 +25,37 @@ class Page {
    * Register any options for this admin page (called on admin_init).
    */
   function initialize_options() {
-    
+    if(static::$settings_section) {
+      add_settings_section(
+        static::$settings_section,
+        static::$page_title,
+        function() {
+          // echo '<p></p>';
+        },
+        static::$menu_slug
+      );
+    }
+
+    if(static::$settings) {
+      foreach (static::$settings as $id => $setting) {
+        if($setting['type'] !== 'sync_now') {
+          add_option($id, '');
+        }
+
+        $args = array_merge(array($id), (@$setting['args'] ?: array()));
+
+        add_settings_field(
+          $id,
+          $setting['title'],
+          array($this, 'render_'.$setting['type'].'_setting'),
+          static::$menu_slug,
+          static::$settings_section,
+          $args
+        );
+
+        register_setting(static::$settings_section, $id);
+      }
+    }
   }
 
   /**
@@ -45,10 +79,15 @@ class Page {
     ?>
     <div class="wrap">
       <h2><?= static::$page_title ?></h2>
-      <form action="options.php" method="post">
+      <form id="social_feeds_settings" action="options.php" method="post">
         <?php
-        do_settings_sections( static::$menu_slug );
-        submit_button();
+        if(static::$settings_section) {
+          settings_fields( static::$settings_section );
+        }
+        if(static::$menu_slug) {
+          do_settings_sections( static::$menu_slug );
+          submit_button();
+        }
         ?>
       </form>
     </div>
@@ -66,6 +105,13 @@ class Page {
     if(isset($args[1])) {
       echo '<br/>'.$args[1];
     }
+  }
+
+  function render_sync_now_setting() {
+    ?>
+    <p>Sync all posts since <input type="date" name="<?= static::$network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= static::$network ?>_sync_now_button" data-network="twitter" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
+    <p><label><input type="checkbox" name="<?= static::$network ?>_sync_update"> Update details for existing posts</label></p>
+    <?php
   }
 
 }

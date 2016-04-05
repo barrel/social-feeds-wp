@@ -36,12 +36,9 @@ class SocialFeeds {
     }
 
     if(isset($_REQUEST['instagram_sync_now'])) {
-
-      $instagram_options = array('instagram_client_id', 'instagram_client_secret', 'instagram_access_token', 'instagram_feed_hashtag', 'instagram_feed_username');
-
-      foreach ($instagram_options as $option_name) {
-        if(isset($_REQUEST[$option_name])) {
-          update_option($option_name, $_REQUEST[$option_name]);
+      foreach (InstagramSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
         }
       }
 
@@ -54,12 +51,9 @@ class SocialFeeds {
         'updated' => $sync_now->updated
       ));
     } else if(isset($_REQUEST['twitter_sync_now'])) {
-
-      $twitter_options = array('twitter_consumer_key', 'twitter_consumer_secret', 'twitter_access_token', 'twitter_access_token_secret', 'twitter_feed_hashtag', 'twitter_feed_username');
-
-      foreach ($twitter_options as $option_name) {
-        if(isset($_REQUEST[$option_name])) {
-          update_option($option_name, $_REQUEST[$option_name]);
+      foreach (TwitterSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
         }
       }
 
@@ -99,6 +93,10 @@ class SocialFeeds {
     new Admin\SelectPostsPage;
     new Admin\InstagramSettingsPage;
     new Admin\TwitterSettingsPage;
+
+    add_action('admin_menu', function() {
+      remove_submenu_page('edit.php?post_type=social-post', 'post-new.php?post_type=social-post');
+    });
 
     add_action('admin_enqueue_scripts', function($hook) {
       wp_register_style(
