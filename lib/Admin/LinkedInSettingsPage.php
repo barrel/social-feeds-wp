@@ -42,6 +42,14 @@ class LinkedInSettingsPage extends Page {
       'title' => 'Sync Now',
       'args' => array('linkedin')
     ),
+    'linkedin_cron' => array(
+      'type' => 'cron',
+      'title' => 'Auto-Update',
+      'args' => array('linkedin')
+    ),
+    'linkedin_cron_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function __construct() {

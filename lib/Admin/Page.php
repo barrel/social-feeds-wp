@@ -36,7 +36,7 @@ class Page {
 
     if(static::$settings) {
       foreach (static::$settings as $id => $setting) {
-        if($setting['type'] !== 'sync_now') {
+        if($setting['type'] !== 'sync_now' && $setting['type'] !== 'cron') {
           add_option($id, '');
         }
 
@@ -120,6 +120,19 @@ class Page {
     <p>Sync all posts since <input type="date" name="<?= $network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= $network ?>_sync_now_button" data-network="<?= $network ?>" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
     <p><label><input type="checkbox" name="<?= $network ?>_sync_update"> Update details for existing posts</label></p>
     <?php
+  }
+
+  function render_cron_setting($args) {
+    $network = $args[1];
+    $cron = get_option( $network.'_cron' );
+    ?>
+    <p>Auto-update <select name="<?= $network ?>_cron"> <option value="">Never</option> <option value="daily" <?= $cron == 'daily' ? 'selected' : '' ?>>Daily</option> <option value="twicedaily" <?= $cron == 'twicedaily' ? 'selected' : '' ?>>Twice Daily</option> <option value="hourly" <?= $cron == 'hourly' ? 'selected' : '' ?>>Hourly</option> </select></p>
+    <p><label><input type="checkbox" name="<?= $network ?>_cron_publish" <?= get_option( $network.'_cron_publish' ) ? 'checked' : '' ?>> Automatically publish new posts with auto-update</label></p>
+    <?php
+  }
+
+  function render_hidden_setting($args) {
+    
   }
 
 }

@@ -8,6 +8,7 @@ Version: 0.1.0
 namespace Barrel\SocialFeeds;
 use MetzWeb\Instagram\Instagram;
 use League\OAuth2\Client\Provider\LinkedIn;
+use WP_Query;
 
 require('vendor/autoload.php');
 
@@ -153,6 +154,11 @@ class SocialFeeds {
       ));
     }
     
+    $this->init_cron_event('linkedin');
+    $this->init_cron_event('twitter');
+    
+    $this->init_cron('linkedin');
+    $this->init_cron('twitter');
 
   }
 
@@ -259,6 +265,30 @@ class SocialFeeds {
   }
 
   /**
+   * Schedule cron for network
+   */
+  function init_cron($network = '') {
+    $cron = get_option($network.'_cron');
+    $cron_name = 'social_feeds_auto_update_'.$network;
+    $next = wp_next_scheduled( $cron_name, array($network) );
+    if( $cron && $cron != '' ) {
+      if(!$next) {
+        wp_schedule_event( mktime(14, 0, 0), $cron, $cron_name, array($network) );
+      }
+    } else {
+      wp_unschedule_event( $next, $cron_name );
+    }
+  }
+
+  /**
+   * Create event for network cron
+   */
+  function init_cron_event($network = '') {
+    $cron_name = 'social_feeds_auto_update_'.$network;
+    add_action( $cron_name, array( $this, 'run_update' ), 51, 1 );
+  }
+
+  /**
    * Handle the Instagram OAuth response to retrieve an access token
    */
   function retrieve_access_token($network) {
@@ -318,6 +348,56 @@ class SocialFeeds {
       }
     }
   }
+
+  /**
+   * Process cron update
+   */
+  public static function run_update($network = '') {
+
+    $sync_date = time();
+
+    $last_post = new WP_Query( array(
+      'post_type'  =>  'social-post',
+      'post_status' => 'publish',
+      'meta_key' => 'social_post_created',
+      'orderby' => 'meta_value',
+      'order' => 'DESC',
+      'posts_per_page' => 1,
+      'tax_query' => array(
+          array(
+              'taxonomy' => 'social_types',
+              'field' => 'slug',
+              'terms' => $network,
+          ),
+        )
+    ) );
+
+    if ( $last_post->have_posts() ) {
+      while ($last_post->have_posts()) { $last_post->the_post();
+        $sync_date = get_post_time('U', true);
+      }
+    }
+
+    if( $network == 'instagram' ) {
+
+      $sync_now = new Update\InstagramFeed(array(
+        'sync_start_date' => $sync_date,
+        'sync_publish' => get_option( $network.'_cron_publish' )
+      ));
+
+    } else if( $network == 'twitter' ) {
+
+      $sync_now = new Update\TwitterFeed(array(
+        'sync_start_date' => $sync_date,
+        'sync_publish' => get_option( $network.'_cron_publish' )
+      ));
+
+    } else if( $network == 'linkedin' ) {
+
+      $sync_now = new Update\LinkedInFeed(array(
+        'sync_start_date' => $sync_date,
+        'sync_publish' => get_option( $network.'_cron_publish' )
+      ));
 
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace Barrel\SocialFeeds\Update;
 use Misd\Linkify\Linkify;
+use WP_Query;
 
 require_once(ABSPATH.'wp-admin/includes/media.php');
 require_once(ABSPATH.'wp-admin/includes/file.php');
@@ -18,6 +19,10 @@ class Feed {
 
     if(isset($options['sync_update'])) {
       $this->sync_update = $options['sync_update'];
+    }
+
+    if(isset($options['sync_publish'])) {
+      $this->sync_publish = $options['sync_publish'];
     }
 
     $this->linkify = new Linkify();
@@ -94,11 +99,14 @@ class Feed {
     if(empty($existing)) {
       $update_details = true;
 
+      $post_status = @$this->sync_publish ? 'publish' : 'draft';
+
       // Create the post, saving caption to title
       $id = wp_insert_post(array(
         'post_type' => 'social-post',
         'post_title' => $title,
-        'post_content' => $content
+        'post_content' => $content,
+        'post_status' => $post_status
       ));
 
       // Save the unique identifier (permalink) and media to post
@@ -115,6 +123,7 @@ class Feed {
       if($post_info['video']) {
         update_post_meta($id, 'social_post_video', $post_info['video']);
       }
+
     } else {
       // Find existing post.
       $id = $existing[0]->ID;

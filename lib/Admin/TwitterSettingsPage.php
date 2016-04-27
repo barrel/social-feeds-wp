@@ -45,7 +45,15 @@ class TwitterSettingsPage extends Page {
       'type' => 'sync_now',
       'title' => 'Sync Now',
       'args' => array('twitter')
-    )
+    ),
+    'twitter_cron' => array(
+      'type' => 'cron',
+      'title' => 'Auto-Update',
+      'args' => array('twitter')
+    ),
+    'twitter_cron_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function add_options_page() {
