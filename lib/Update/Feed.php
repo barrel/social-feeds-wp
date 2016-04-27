@@ -26,6 +26,8 @@ class Feed {
   function save($feed, &$updated = array()) {
     if(static::$network === 'instagram') {
       $results = $feed->data;
+    } else if(static::$network === 'linkedin') {
+      $results = $feed['values'];
     } else {
       $results = $feed;
     }
@@ -135,6 +137,9 @@ class Feed {
       update_post_meta($id, 'social_post_created', $post_info['created']);
       update_post_meta($id, 'social_post_details', $post_info['details']);
     }
+
+    // Save post type
+    wp_set_object_terms($id, array($post_info['type']), 'social_types');
 
     return $id;
   }

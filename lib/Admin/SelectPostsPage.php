@@ -24,19 +24,47 @@ class SelectPostsPage extends Page {
     // Update on admin page load?
     // new InstagramFeed();
 
-    $social_post_query = new \WP_Query(array(
+    $types = get_terms( 'social_types', array(
+        'hide_empty' => false,
+    ) );
+
+    $query = array(
       'post_type' => 'social-post',
       'post_status' => 'any',
       'posts_per_page' => -1,
       'meta_key' => 'social_post_created',
-      'orderby' => 'meta_value'
-    ));
+      'orderby' => 'meta_value',
+    );
+
+    $social_type = isset($_GET['social_type']) ? $_GET['social_type'] : false;
+
+    if($social_type) {
+      $query['tax_query'] = array(
+        array(
+            'taxonomy' => 'social_types',
+            'field' => 'slug',
+            'terms' => $social_type,
+        ),
+      );
+    }
+
+    $social_post_query = new \WP_Query($query);
     ?>
     <div class="wrap">
       <h2><?= self::$page_title ?></h2>
       <p>Select posts to make visible on the front end.</p>
-      <form action="<?= admin_url('admin-post.php'); ?>" method="post">
+      <?php if( count($types) > 1 ): ?>
+      <ul class="subsubsub">
+        <?php $type_index=0; foreach($types as $type): ?>
+         <?php if(!isset(\Barrel\SocialFeeds\SocialFeeds::$options['enable_'.$type->slug]) || \Barrel\SocialFeeds\SocialFeeds::$options['enable_'.$type->slug] === true): ?>
+          <li><a href="<?= add_query_arg( array( 'post_type' => 'social-post', 'social_type' => $type->slug ), admin_url( 'edit.php?page=select-posts' ) ); ?>" class="<?php if( $social_type == $type->slug ): ?>current<?php endif; ?>"><?= $type->name ?></a> <?php if( $type_index < count($types)-1 ): ?>|<?php endif; ?></li>
+         <?php endif; ?>
+        <?php $type_index++; endforeach; ?>
+      </ul>
+      <?php endif; ?>
+      <form action="<?= admin_url('admin-post.php'); ?>" method="post" style="clear: both;">
         <input type="hidden" name="action" value="curate_social_feed">
+        <input type="hidden" name="curate_social_feed_type" value="<?= $social_type ?>">
         <?php submit_button(); ?>
         <div class="social-post-cards">
           <?php
@@ -61,6 +89,10 @@ class SelectPostsPage extends Page {
               }
 
               wp_reset_postdata();
+            } else {
+            ?>
+            <p>There are no posts yet for this social media type. Run "Sync Now" under the settings to load older posts.</p>
+            <?php
             }
           ?>
         </div>
@@ -74,11 +106,25 @@ class SelectPostsPage extends Page {
    */
   function curate_feed() {
     if(isset($_REQUEST['social-post-publish']) && is_array($_REQUEST['social-post-publish'])) {
-      $published_posts = get_posts(array(
+
+      $published_posts_args = array(
         'post_type' => 'social-post',
         'post_status' => 'publish',
         'posts_per_page' => -1
-      ));
+      );
+
+      $social_type = isset($_REQUEST['curate_social_feed_type']) ? $_REQUEST['curate_social_feed_type'] : false;
+      if($social_type) {
+        $published_posts_args['tax_query'] = array(
+          array(
+              'taxonomy' => 'social_types',
+              'field' => 'slug',
+              'terms' => $social_type,
+          ),
+        );
+      }
+
+      $published_posts = get_posts($published_posts_args);
 
       $published = array_map(function($social_post) {
         return strval($social_post->ID);

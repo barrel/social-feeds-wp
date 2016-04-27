@@ -44,7 +44,7 @@ class Page {
           continue;
         }
 
-        $args = array_merge(array($id), (@$setting['args'] ?: array()));
+        $args = array_merge(array($id), (@$setting['args'] ?: array()), array(@$setting['hide']));
 
         add_settings_field(
           $id,
@@ -102,17 +102,22 @@ class Page {
   function render_text_setting($args) {
     $option = get_option( $args[0] );
     
-    echo '<input type="text" id="twitter" name="'.$args[0].'" value="' . htmlspecialchars($option) . '" size="50" />';
+    if(!isset($args[2])) {
+      echo '<input type="text" id="twitter" name="'.$args[0].'" value="' . htmlspecialchars($option) . '" size="50" />';
+    } else {
+      echo '<input type="hidden" id="twitter" name="'.$args[0].'" value="' . htmlspecialchars($option) . '" size="50" />';
+    }
     
     if(isset($args[1])) {
-      echo '<br/>'.$args[1];
+      echo !isset($args[2]) ? '<br/>' : '';
+      echo $args[1];
     }
   }
 
   function render_sync_now_setting($args) {
     $network = $args[1];
     ?>
-    <p>Sync all posts since <input type="date" name="<?= $network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= $network ?>_sync_now_button" data-network="twitter" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
+    <p>Sync all posts since <input type="date" name="<?= $network ?>_sync_start" value="" placeholder="Select a date..." /> <button type="button" name="<?= $network ?>_sync_now_button" data-network="<?= $network ?>" class="button" disabled>Sync Now</button><img class="social-feeds-spinner" src="<?= admin_url('images/loading.gif'); ?>"></p>
     <p><label><input type="checkbox" name="<?= $network ?>_sync_update"> Update details for existing posts</label></p>
     <?php
   }

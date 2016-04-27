@@ -69,7 +69,8 @@ class InstagramFeed extends Feed {
       'video' => @$social_post->videos->standard_resolution->url,
       'username' => $social_post->user->username,
       'created' => $social_post->created_time,
-      'details' => json_encode($social_post)
+      'details' => json_encode($social_post),
+      'type' => 'Instagram'
     );
   }
 

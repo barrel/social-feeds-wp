@@ -7,6 +7,7 @@ Version: 0.1.0
 
 namespace Barrel\SocialFeeds;
 use MetzWeb\Instagram\Instagram;
+use League\OAuth2\Client\Provider\LinkedIn;
 
 require('vendor/autoload.php');
 
@@ -20,7 +21,7 @@ class SocialFeeds {
 
   function __construct($options = array()) {
 
-    add_action('init', array($this, 'init'));
+    $this->init_post_type();
 
     if(is_admin()) {
       $this->init_admin();
@@ -29,7 +30,8 @@ class SocialFeeds {
     if(!empty($options)) {
       $settings = array_merge(
         array_keys(Admin\InstagramSettingsPage::$settings),
-        array_keys(Admin\TwitterSettingsPage::$settings)
+        array_keys(Admin\TwitterSettingsPage::$settings),
+        array_keys(Admin\LinkedInSettingsPage::$settings)
       );
 
       foreach ($options as $key => $val) {
@@ -41,6 +43,54 @@ class SocialFeeds {
       }
     }
 
+    add_action('init', array($this, 'init'), 50);
+
+  }
+
+  /**
+   * Initialize post type
+   */
+  function init_post_type() {
+
+    /** Register the custom post type for social posts. */
+    register_post_type('social-post', array(
+      'labels' => array(
+        'name' => 'Social Posts',
+        'singular_name' => 'Social Post',
+        'menu_name' => 'Social Posts',
+      ),
+      'public' => false,
+      'show_ui' => true,
+      'show_in_nav_menus' => false,
+      'show_in_menu' => true,
+      'show_in_admin_bar' => false,
+      'menu_icon' => 'dashicons-thumbs-up',
+      'supports' => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+      'taxonomies' => array( 'social_types' ),
+    ));
+
+    /** Register the custom post type for social posts. */
+    register_taxonomy(
+        'social_types',
+        'social-post',
+        array(
+            'labels' => array(
+                'name' => 'Social Post Type',
+            ),
+            'show_ui' => false,
+            'show_tagcloud' => false,
+            'hierarchical' => false,
+            'query_var'    => false,
+            'public' => false,
+            'rewrite' => false,
+        )
+    );
+
+    // Add each type to taxonomy
+    wp_insert_term('Instagram', 'social_types');
+    wp_insert_term('Twitter', 'social_types');
+    wp_insert_term('LinkedIn', 'social_types');
+
   }
 
   /**
@@ -48,9 +98,12 @@ class SocialFeeds {
    */
   function init() {
 
-    if(isset($_REQUEST['callback']) &&
-      $_REQUEST['callback'] == 'instagram_auth') {
-      $this->retrieve_access_token();
+    if(isset($_REQUEST['callback'])) {
+      if($_REQUEST['callback'] == 'instagram_auth') {
+        $this->retrieve_access_token('instagram');
+      } else if($_REQUEST['callback'] == 'linkedin_auth') {
+        $this->retrieve_access_token('linkedin');
+      }
     }
 
     if(isset($_REQUEST['instagram_sync_now'])) {
@@ -83,23 +136,23 @@ class SocialFeeds {
       wp_send_json(array(
         'updated' => $sync_now->updated
       ));
-    }
+    } else if(isset($_REQUEST['linkedin_sync_now'])) {
+      foreach (Admin\LinkedInSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
+        }
+      }
 
-    /** Register the custom post type for social posts. */
-    register_post_type('social-post', array(
-      'labels' => array(
-        'name' => 'Social Posts',
-        'singular_name' => 'Social Post',
-        'menu_name' => 'Social Posts',
-      ),
-      'public' => false,
-      'show_ui' => true,
-      'show_in_nav_menus' => false,
-      'show_in_menu' => true,
-      'show_in_admin_bar' => false,
-      'menu_icon' => 'dashicons-thumbs-up',
-      'supports' => array('title', 'editor', 'thumbnail', 'custom-fields')
-    ));
+      $sync_now = new Update\LinkedInFeed(array(
+        'sync_start_date' => $_REQUEST['linkedin_sync_now'],
+        'sync_update' => @$_REQUEST['linkedin_sync_update']
+      ));
+
+      wp_send_json(array(
+        'updated' => $sync_now->updated
+      ));
+    }
+    
 
   }
 
@@ -111,6 +164,7 @@ class SocialFeeds {
     new Admin\SelectPostsPage;
     new Admin\InstagramSettingsPage;
     new Admin\TwitterSettingsPage;
+    new Admin\LinkedInSettingsPage;
 
     add_action('admin_menu', function() {
       remove_submenu_page('edit.php?post_type=social-post', 'post-new.php?post_type=social-post');
@@ -146,7 +200,7 @@ class SocialFeeds {
       );
 
       wp_enqueue_script('jquery-ui-core');
-      wp_enqueue_script('jquery-ui-datepicker' );
+      wp_enqueue_script('jquery-ui-datepicker');
       wp_enqueue_style('jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
 
       wp_enqueue_script(
@@ -207,24 +261,66 @@ class SocialFeeds {
   /**
    * Handle the Instagram OAuth response to retrieve an access token
    */
-  function retrieve_access_token() {
-    $instagram = new Instagram(array(
-      'apiKey' => get_option('instagram_client_id'),
-      'apiSecret' => get_option('instagram_client_secret'),
-      'apiCallback' => home_url('/?callback=instagram_auth')
-    ));
+  function retrieve_access_token($network) {
+    if($network === 'instagram') {
+      $instagram = new Instagram(array(
+        'apiKey' => get_option('instagram_client_id'),
+        'apiSecret' => get_option('instagram_client_secret'),
+        'apiCallback' => home_url('/?callback=instagram_auth')
+      ));
 
-    $code = $_REQUEST['code'];
-    $result = $instagram->getOAuthToken($code);
+      $code = $_REQUEST['code'];
+      $result = $instagram->getOAuthToken($code);
 
-    if(isset($result->access_token)) {
-      update_option('instagram_access_token', $result->access_token);
+      if(isset($result->access_token)) {
+        update_option('instagram_access_token', $result->access_token);
 
-      $settings_page = admin_url('edit.php?post_type=social-post&page=feed-settings');
+        $settings_page = admin_url('edit.php?post_type=social-post&page=instagram-settings');
 
-      \wp_redirect($settings_page);
-      exit;
+        wp_redirect($settings_page);
+        exit;
+      }
+    } else if($network === 'linkedin') {
+      $linkedin = new LinkedIn(array(
+        'clientId'          => get_option('linkedin_client_id'),
+        'clientSecret'      => get_option('linkedin_client_secret'),
+        'redirectUri'       => home_url('/?callback=linkedin_auth'),
+      ));
+
+      $code = $_REQUEST['code'];
+      $result = $linkedin->getAccessToken('authorization_code', array(
+        'code' => $code
+      ));
+      $token = $result->getToken();
+
+      if(isset($token)) {
+        update_option('linkedin_access_token', $token);
+
+        $company_name = get_option('linkedin_company_name');
+        if( $company_name) {
+          $resource = '/v1/companies';
+          $params = array('oauth2_access_token' => $token, 'format' => 'json', 'is-company-admin' => 'true');
+          $url = 'https://api.linkedin.com' . $resource . '?' . http_build_query($params);
+          $context = stream_context_create(array('http' => array('method' => 'GET')));
+          $response = file_get_contents($url, false, $context);
+          $companies = json_decode($response, true);
+          foreach($companies['values'] as $company) {
+            if(strtolower($company_name) == strtolower($company['name'])) {
+              update_option('linkedin_company_id', $company['id']);
+            }
+          }
+        }
+
+        $settings_page = admin_url('edit.php?post_type=social-post&page=linkedin-settings');
+
+        wp_redirect($settings_page);
+        exit;
+      }
     }
+  }
+
+    }
+
   }
 
 }

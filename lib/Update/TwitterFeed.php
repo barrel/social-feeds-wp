@@ -59,7 +59,8 @@ class TwitterFeed extends Feed {
       'video' => false,
       'username' => $social_post['user']['screen_name'],
       'created' => strtotime($social_post['created_at']),
-      'details' => json_encode($social_post)
+      'details' => json_encode($social_post),
+      'type' => 'Twitter'
     );
   }
 
