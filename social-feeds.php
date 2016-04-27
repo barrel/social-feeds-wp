@@ -5,6 +5,22 @@ Description: Curate posts from social feeds.
 Version: 0.1.0
 */
 
+/*
+Hide API credentials from dashboard by defining in your wp-config 
+
+  define( 'SF_TWITTER_CONSUMER_KEY', 'YOUR KEY' );
+  define( 'SF_TWITTER_CONSUMER_SECRET', 'YOUR SECRET' );
+  define( 'SF_TWITTER_ACCESS_TOKEN', 'YOUR ACCESS TOKEN' );
+  define( 'SF_TWITTER_ACCESS_TOKEN_SECRET', 'YOUR ACCESS TOKEN SECRET' );
+
+  define( 'SF_LINKEDIN_COMPANY_NAME', 'YOUR COMPANY PAGE NAME' );
+  define( 'SF_LINKEDIN_CLIENT_ID', 'YOUR CLIENT ID' );
+  define( 'SF_LINKEDIN_CLIENT_SECRET', 'YOUR CLIENT SECRET' );
+
+  define( 'SF_MAX_PUBLISHED', 'NUMBER OF MAXIMUM POSTS TO ALLOW' );
+
+*/
+
 namespace Barrel\SocialFeeds;
 use MetzWeb\Instagram\Instagram;
 use League\OAuth2\Client\Provider\LinkedIn;
@@ -21,6 +37,15 @@ class SocialFeeds {
   static $is_plugin = false;
 
   function __construct($options = array()) {
+
+    $options['twitter_consumer_key'] = defined('SF_TWITTER_CONSUMER_KEY') ? SF_TWITTER_CONSUMER_KEY : null;
+    $options['twitter_consumer_secret'] = defined('SF_TWITTER_CONSUMER_SECRET') ? SF_TWITTER_CONSUMER_SECRET : null;
+    $options['twitter_access_token'] = defined('SF_TWITTER_ACCESS_TOKEN') ? SF_TWITTER_ACCESS_TOKEN : null;
+    $options['twitter_access_token_secret'] = defined('SF_TWITTER_ACCESS_TOKEN_SECRET') ? SF_TWITTER_ACCESS_TOKEN_SECRET : null;
+
+    $options['linkedin_company_name'] = defined('SF_LINKEDIN_COMPANY_NAME') ? SF_LINKEDIN_COMPANY_NAME : null;
+    $options['linkedin_client_id'] = defined('SF_LINKEDIN_CLIENT_ID') ? SF_LINKEDIN_CLIENT_ID : null;
+    $options['linkedin_client_secret'] = defined('SF_LINKEDIN_CLIENT_SECRET') ? SF_LINKEDIN_CLIENT_SECRET : null;
 
     $this->init_post_type();
 
