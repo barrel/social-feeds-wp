@@ -57,6 +57,11 @@ class Feed {
         $this->save($this->instagram->pagination($feed, 30), $updated);
       }
     }
+
+    $max = defined('SF_MAX_PUBLISHED') ? SF_MAX_PUBLISHED : -1;
+
+    $this->prune_social_post(static::$network, $max);
+
   }
 
   function get_option_terms($option_name) {
@@ -151,6 +156,47 @@ class Feed {
     wp_set_object_terms($id, array($post_info['type']), 'social_types');
 
     return $id;
+  }
+
+  /**
+   * Prunes older posts of the custom post type and taxonomy.
+   */
+  function prune_social_post($network = '', $max = -1) {
+
+    if($max <= 0) return;
+    
+    $latest_posts = new WP_Query( array(
+      'post_type'  =>  'social-post',
+      'post_status' => 'publish',
+      'meta_key' => 'social_post_created',
+      'orderby' => 'meta_value',
+      'posts_per_page' => -1,
+      'tax_query' => array(
+          array(
+              'taxonomy' => 'social_types',
+              'field' => 'slug',
+              'terms' => $network,
+          ),
+        )
+    ) );
+
+    $post_count = 1;
+    $ids = '';
+    while ( $latest_posts->have_posts() ) { $latest_posts->the_post();
+      if($post_count > $max) {
+        $id = get_the_ID();
+        wp_update_post(array(
+          'ID' => $id,
+          'post_status' => 'draft'
+        ));
+        $ids .= $id.',';
+      }
+      $post_count++;
+    }
+    update_option('run_update', $ids);
+
+    wp_reset_postdata();
+
   }
 
 }
