@@ -38,34 +38,30 @@ class SocialFeeds {
 
   function __construct($options = array()) {
 
-    $options['twitter_consumer_key'] = defined('SF_TWITTER_CONSUMER_KEY') ? SF_TWITTER_CONSUMER_KEY : null;
-    $options['twitter_consumer_secret'] = defined('SF_TWITTER_CONSUMER_SECRET') ? SF_TWITTER_CONSUMER_SECRET : null;
-    $options['twitter_access_token'] = defined('SF_TWITTER_ACCESS_TOKEN') ? SF_TWITTER_ACCESS_TOKEN : null;
-    $options['twitter_access_token_secret'] = defined('SF_TWITTER_ACCESS_TOKEN_SECRET') ? SF_TWITTER_ACCESS_TOKEN_SECRET : null;
-
-    $options['linkedin_company_name'] = defined('SF_LINKEDIN_COMPANY_NAME') ? SF_LINKEDIN_COMPANY_NAME : null;
-    $options['linkedin_client_id'] = defined('SF_LINKEDIN_CLIENT_ID') ? SF_LINKEDIN_CLIENT_ID : null;
-    $options['linkedin_client_secret'] = defined('SF_LINKEDIN_CLIENT_SECRET') ? SF_LINKEDIN_CLIENT_SECRET : null;
-
     $this->init_post_type();
 
     if(is_admin()) {
       $this->init_admin();
     }
 
-    if(!empty($options)) {
-      $settings = array_merge(
-        array_keys(Admin\InstagramSettingsPage::$settings),
-        array_keys(Admin\TwitterSettingsPage::$settings),
-        array_keys(Admin\LinkedInSettingsPage::$settings)
-      );
+    $settings = array_merge(
+      array_keys(Admin\InstagramSettingsPage::$settings),
+      array_keys(Admin\TwitterSettingsPage::$settings),
+      array_keys(Admin\LinkedInSettingsPage::$settings)
+    );
 
-      foreach ($options as $key => $val) {
-        self::$options[$key] = $val;
+    foreach ($settings as $key) {
+      $value = null;
+      $setting_const = strtoupper('sf_'.$key);
+      
+      if(defined($setting_const)) {
+        $value = constant($setting_const);
+      } else if(array_key_exists($key, $options)) (
+        $value = $options[$key];
+      )
 
-        if(in_array($key, $settings)) {
-          update_option($key, $val);
-        }
+      if($value !== null) {
+        update_option($key, $value);
       }
     }
 
