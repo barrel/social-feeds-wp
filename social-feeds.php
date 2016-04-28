@@ -56,9 +56,9 @@ class SocialFeeds {
       
       if(defined($setting_const)) {
         $value = constant($setting_const);
-      } else if(array_key_exists($key, $options)) (
+      } else if(array_key_exists($key, $options)) {
         $value = $options[$key];
-      )
+      }
 
       if($value !== null) {
         update_option($key, $value);
