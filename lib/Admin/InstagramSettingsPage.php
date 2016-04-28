@@ -41,7 +41,15 @@ class InstagramSettingsPage extends Page {
       'type' => 'sync_now',
       'title' => 'Sync Now',
       'args' => array('instagram')
-    )
+    ),
+    'instagram_cron' => array(
+      'type' => 'cron',
+      'title' => 'Auto-Update',
+      'args' => array('instagram')
+    ),
+    'instagram_cron_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function __construct() {
