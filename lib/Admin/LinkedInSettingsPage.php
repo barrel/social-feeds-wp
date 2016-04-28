@@ -37,7 +37,7 @@ class LinkedInSettingsPage extends Page {
       'title' => 'Access Token',
       'hide' => true
     ),
-    'sync_now' => array(
+    'linkedin_sync_now' => array(
       'type' => 'sync_now',
       'title' => 'Sync Now',
       'args' => array('linkedin')

@@ -48,7 +48,7 @@ class Page {
 
         add_settings_field(
           $id,
-          $setting['title'],
+          @$setting['title'] ?: $id,
           array($this, 'render_'.$setting['type'].'_setting'),
           static::$menu_slug,
           static::$settings_section,

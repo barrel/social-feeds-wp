@@ -41,7 +41,7 @@ class TwitterSettingsPage extends Page {
       'title' => 'Username(s)',
       'args' => array('<em>Enter one or more usernames separated with spaces. (Optional)</em>'),
     ),
-    'sync_now' => array(
+    'twitter_sync_now' => array(
       'type' => 'sync_now',
       'title' => 'Sync Now',
       'args' => array('twitter')
