@@ -89,6 +89,7 @@ class SocialFeeds {
       'menu_icon' => 'dashicons-thumbs-up',
       'supports' => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
       'taxonomies' => array( 'social_types' ),
+      'rewrite' => false
     ));
 
     /** Register the custom post type for social posts. */
