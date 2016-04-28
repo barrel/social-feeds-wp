@@ -33,6 +33,7 @@ require('vendor/autoload.php');
  */
 class SocialFeeds {
 
+  static $networks = array('twitter', 'instagram', 'linkedin');
   static $options = array();
   static $is_plugin = false;
 
@@ -121,66 +122,12 @@ class SocialFeeds {
    */
   function init() {
 
-    if(isset($_REQUEST['callback'])) {
-      if($_REQUEST['callback'] == 'instagram_auth') {
-        $this->retrieve_access_token('instagram');
-      } else if($_REQUEST['callback'] == 'linkedin_auth') {
-        $this->retrieve_access_token('linkedin');
-      }
+    $this->handle_auth_request();
+    $this->handle_sync_request();
+
+    foreach (self::$networks as $network) {
+      $this->init_auto_update($network);
     }
-
-    if(isset($_REQUEST['instagram_sync_now'])) {
-      foreach (Admin\InstagramSettingsPage::$settings as $id => $setting) {
-        if(isset($_REQUEST[$id])) {
-          update_option($id, $_REQUEST[$id]);
-        }
-      }
-
-      $sync_now = new Update\InstagramFeed(array(
-        'sync_start_date' => $_REQUEST['instagram_sync_now'],
-        'sync_update' => @$_REQUEST['instagram_sync_update']
-      ));
-
-      wp_send_json(array(
-        'updated' => $sync_now->updated
-      ));
-    } else if(isset($_REQUEST['twitter_sync_now'])) {
-      foreach (Admin\TwitterSettingsPage::$settings as $id => $setting) {
-        if(isset($_REQUEST[$id])) {
-          update_option($id, $_REQUEST[$id]);
-        }
-      }
-
-      $sync_now = new Update\TwitterFeed(array(
-        'sync_start_date' => $_REQUEST['twitter_sync_now'],
-        'sync_update' => @$_REQUEST['twitter_sync_update']
-      ));
-
-      wp_send_json(array(
-        'updated' => $sync_now->updated
-      ));
-    } else if(isset($_REQUEST['linkedin_sync_now'])) {
-      foreach (Admin\LinkedInSettingsPage::$settings as $id => $setting) {
-        if(isset($_REQUEST[$id])) {
-          update_option($id, $_REQUEST[$id]);
-        }
-      }
-
-      $sync_now = new Update\LinkedInFeed(array(
-        'sync_start_date' => $_REQUEST['linkedin_sync_now'],
-        'sync_update' => @$_REQUEST['linkedin_sync_update']
-      ));
-
-      wp_send_json(array(
-        'updated' => $sync_now->updated
-      ));
-    }
-    
-    $this->init_cron_event('linkedin');
-    $this->init_cron_event('twitter');
-    
-    $this->init_cron('linkedin');
-    $this->init_cron('twitter');
 
   }
 
@@ -287,11 +234,78 @@ class SocialFeeds {
   }
 
   /**
-   * Schedule cron for network
+   * If the current request is an Oauth callback, retrieve the access token
    */
-  function init_cron($network = '') {
+  function handle_auth_request() {
+    if(isset($_REQUEST['callback'])) {
+      if($_REQUEST['callback'] == 'instagram_auth') {
+        $this->retrieve_access_token('instagram');
+      } else if($_REQUEST['callback'] == 'linkedin_auth') {
+        $this->retrieve_access_token('linkedin');
+      }
+    }
+  }
+
+  /**
+   * If the current request is a sync_now call, trigger the sync
+   */
+  function handle_sync_request() {
+    if(isset($_REQUEST['instagram_sync_now'])) {
+      foreach (Admin\InstagramSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
+        }
+      }
+
+      $sync_now = new Update\InstagramFeed(array(
+        'sync_start_date' => $_REQUEST['instagram_sync_now'],
+        'sync_update' => @$_REQUEST['instagram_sync_update']
+      ));
+
+      wp_send_json(array(
+        'updated' => $sync_now->updated
+      ));
+    } else if(isset($_REQUEST['twitter_sync_now'])) {
+      foreach (Admin\TwitterSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
+        }
+      }
+
+      $sync_now = new Update\TwitterFeed(array(
+        'sync_start_date' => $_REQUEST['twitter_sync_now'],
+        'sync_update' => @$_REQUEST['twitter_sync_update']
+      ));
+
+      wp_send_json(array(
+        'updated' => $sync_now->updated
+      ));
+    } else if(isset($_REQUEST['linkedin_sync_now'])) {
+      foreach (Admin\LinkedInSettingsPage::$settings as $id => $setting) {
+        if(isset($_REQUEST[$id])) {
+          update_option($id, $_REQUEST[$id]);
+        }
+      }
+
+      $sync_now = new Update\LinkedInFeed(array(
+        'sync_start_date' => $_REQUEST['linkedin_sync_now'],
+        'sync_update' => @$_REQUEST['linkedin_sync_update']
+      ));
+
+      wp_send_json(array(
+        'updated' => $sync_now->updated
+      ));
+    }
+  }
+
+  function init_auto_update($network) {
     $cron = get_option($network.'_cron');
     $cron_name = 'social_feeds_auto_update_'.$network;
+
+    // Create event for network cron
+    add_action( $cron_name, array( $this, 'run_update' ), 51, 1 );
+
+    // Schedule cron for network
     $next = wp_next_scheduled( $cron_name, array($network) );
     if( $cron && $cron != '' ) {
       if(!$next) {
@@ -300,14 +314,6 @@ class SocialFeeds {
     } else {
       wp_unschedule_event( $next, $cron_name );
     }
-  }
-
-  /**
-   * Create event for network cron
-   */
-  function init_cron_event($network = '') {
-    $cron_name = 'social_feeds_auto_update_'.$network;
-    add_action( $cron_name, array( $this, 'run_update' ), 51, 1 );
   }
 
   /**
