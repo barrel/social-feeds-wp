@@ -36,10 +36,9 @@ $(function() {
       type: 'POST',
       data: formData,
       success: function(data) {
-        console.log(data);
-
         if(data.updated) {
           $syncButton.text('Sync Finished');
+          showSyncNotice(data);
         }
       },
       error: function() {
@@ -51,3 +50,17 @@ $(function() {
     });
   });
 });
+
+function showSyncNotice(syncData) {
+  var msg = '';
+  var synced = syncData.updated.length;
+  if(synced === 1) {
+    msg = 'Synced '+synced+' post.';
+  } else {
+    msg = 'Synced '+synced+' posts.';
+  }
+
+  var notice = '<div class="notice notice-success"><p><strong>'+msg+'</strong></p></div>';
+
+  $('.wrap h2').first().after(notice);
+}
