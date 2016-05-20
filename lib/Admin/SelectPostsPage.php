@@ -1,6 +1,6 @@
 <?php
 namespace Barrel\SocialFeeds\Admin;
-use Barrel\SocialFeeds\Cron\Update;
+use Barrel\SocialFeeds\Update\InstagramFeed;
 
 /**
  * Creates the admin page for selecting posts to publish.
@@ -18,25 +18,57 @@ class SelectPostsPage extends Page {
     parent::__construct();
 
     add_action('admin_post_curate_social_feed', array($this, 'curate_feed'));
+
+    if(@$_REQUEST['curate_published'] || @$_REQUEST['curate_unpublished']) {
+      add_action('admin_notices', array($this, 'admin_notice_curated'));
+    }
   }
 
   function display_options_page() {
     // Update on admin page load?
-    // new Update();
+    // new InstagramFeed();
 
-    $social_post_query = new \WP_Query(array(
+    $types = get_terms( 'social_types', array(
+        'hide_empty' => false,
+    ) );
+
+    $query = array(
       'post_type' => 'social-post',
       'post_status' => 'any',
       'posts_per_page' => -1,
       'meta_key' => 'social_post_created',
-      'orderby' => 'meta_value'
-    ));
+      'orderby' => 'meta_value',
+    );
+
+    $social_type = isset($_GET['social_type']) ? $_GET['social_type'] : false;
+
+    if($social_type) {
+      $query['tax_query'] = array(
+        array(
+            'taxonomy' => 'social_types',
+            'field' => 'slug',
+            'terms' => $social_type,
+        ),
+      );
+    }
+
+    $social_post_query = new \WP_Query($query);
     ?>
     <div class="wrap">
       <h2><?= self::$page_title ?></h2>
       <p>Select posts to make visible on the front end.</p>
-      <form action="<?= admin_url('admin-post.php'); ?>" method="post">
+      <?php if( count($types) > 1 ): ?>
+      <ul class="subsubsub">
+        <?php $type_index=0; foreach($types as $type): ?>
+         <?php if(!isset(\Barrel\SocialFeeds\SocialFeeds::$options['enable_'.$type->slug]) || \Barrel\SocialFeeds\SocialFeeds::$options['enable_'.$type->slug] === true): ?>
+          <li><a href="<?= add_query_arg( array( 'post_type' => 'social-post', 'social_type' => $type->slug ), admin_url( 'edit.php?page=select-posts' ) ); ?>" class="<?php if( $social_type == $type->slug ): ?>current<?php endif; ?>"><?= $type->name ?></a> <?php if( $type_index < count($types)-1 ): ?>|<?php endif; ?></li>
+         <?php endif; ?>
+        <?php $type_index++; endforeach; ?>
+      </ul>
+      <?php endif; ?>
+      <form action="<?= admin_url('admin-post.php'); ?>" method="post" style="clear: both;">
         <input type="hidden" name="action" value="curate_social_feed">
+        <input type="hidden" name="curate_social_feed_type" value="<?= $social_type ?>">
         <?php submit_button(); ?>
         <div class="social-post-cards">
           <?php
@@ -61,6 +93,10 @@ class SelectPostsPage extends Page {
               }
 
               wp_reset_postdata();
+            } else {
+            ?>
+            <p>There are no posts yet for this social media type. Run "Sync Now" under the settings to load older posts.</p>
+            <?php
             }
           ?>
         </div>
@@ -74,11 +110,25 @@ class SelectPostsPage extends Page {
    */
   function curate_feed() {
     if(isset($_REQUEST['social-post-publish']) && is_array($_REQUEST['social-post-publish'])) {
-      $published_posts = get_posts(array(
+
+      $published_posts_args = array(
         'post_type' => 'social-post',
         'post_status' => 'publish',
         'posts_per_page' => -1
-      ));
+      );
+
+      $social_type = isset($_REQUEST['curate_social_feed_type']) ? $_REQUEST['curate_social_feed_type'] : false;
+      if($social_type) {
+        $published_posts_args['tax_query'] = array(
+          array(
+              'taxonomy' => 'social_types',
+              'field' => 'slug',
+              'terms' => $social_type,
+          ),
+        );
+      }
+
+      $published_posts = get_posts($published_posts_args);
 
       $published = array_map(function($social_post) {
         return strval($social_post->ID);
@@ -86,16 +136,18 @@ class SelectPostsPage extends Page {
 
       $selected = $_REQUEST['social-post-publish'];
 
-      foreach ($selected as $social_post) {
+      $to_publish = array_diff($selected, $published);
+
+      foreach ($to_publish as $social_post) {
         wp_update_post(array(
           'ID' => $social_post,
           'post_status' => 'publish'
         ));
       }
 
-      $unpublish = array_diff($published, $selected);
+      $to_unpublish = array_diff($published, $selected);
 
-      foreach ($unpublish as $social_post) {
+      foreach ($to_unpublish as $social_post) {
         wp_update_post(array(
           'ID' => $social_post,
           'post_status' => 'draft'
@@ -103,8 +155,33 @@ class SelectPostsPage extends Page {
       }
     }
 
-    wp_redirect($_SERVER['HTTP_REFERER']);
+    $redirect = add_query_arg(array(
+      'curate_published' => count($to_publish),
+      'curate_unpublished' => count($to_unpublish)
+    ), $_SERVER['HTTP_REFERER']);
+
+    wp_redirect($redirect);
     exit;
+  }
+
+  function admin_notice_curated() {
+    $published = @$_REQUEST['curate_published'] ?: 0;
+    $unpublished = @$_REQUEST['curate_unpublished'] ?: 0;
+
+    $str = '';
+
+    if($published > 0) {
+      $str .= ' Published '.$published.' '._n('post', 'posts', $published).'.';
+    }
+
+    if($unpublished > 0) {
+      $str .= ' Unpublished '.$unpublished.' '._n('post', 'posts', $unpublished).'.';
+    }
+    ?>
+    <div class="notice notice-success is-dismissible">
+      <p><?= trim($str) ?></p>
+    </div>
+    <?
   }
 
 }

@@ -10,7 +10,9 @@
     "require": {
         "cosenary/instagram": "dev-auth",
         "j7mbo/twitter-api-php": "^1.0",
-        "abraham/twitteroauth": "^0.6.2"
+        "abraham/twitteroauth": "^0.6.2",
+        "misd/linkify": "^1.1",
+        "league/oauth2-linkedin": "0.4.*"
     },
     "autoload": {
         "psr-4": {
