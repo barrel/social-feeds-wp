@@ -2,7 +2,7 @@
 /*
 Plugin Name: Social Feeds
 Description: Curate posts from social feeds.
-Version: 0.1.0
+Version: 0.2.0
 */
 
 /*
@@ -161,7 +161,7 @@ class SocialFeeds {
         'social-feeds-admin',
         $admin_css_uri,
         false,
-        '1.0.0'
+        '0.2.0'
       );
       wp_enqueue_style('social-feeds-admin');
 
@@ -178,7 +178,7 @@ class SocialFeeds {
       'social-feeds-admin',
         $admin_js_uri,
         array('jquery'),
-        '1.0.0'
+        '0.2.0'
       );
     });
 
