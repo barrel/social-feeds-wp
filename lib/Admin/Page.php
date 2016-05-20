@@ -83,6 +83,7 @@ class Page {
     ?>
     <div class="wrap">
       <h2><?= static::$page_title ?></h2>
+      <?php settings_errors(); ?>
       <form id="social_feeds_settings" action="options.php" method="post">
         <?php
         if(static::$settings_section) {
