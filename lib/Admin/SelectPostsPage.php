@@ -18,6 +18,10 @@ class SelectPostsPage extends Page {
     parent::__construct();
 
     add_action('admin_post_curate_social_feed', array($this, 'curate_feed'));
+
+    if(@$_REQUEST['curate_published'] || @$_REQUEST['curate_unpublished']) {
+      add_action('admin_notices', array($this, 'admin_notice_curated'));
+    }
   }
 
   function display_options_page() {
@@ -132,16 +136,18 @@ class SelectPostsPage extends Page {
 
       $selected = $_REQUEST['social-post-publish'];
 
-      foreach ($selected as $social_post) {
+      $to_publish = array_diff($selected, $published);
+
+      foreach ($to_publish as $social_post) {
         wp_update_post(array(
           'ID' => $social_post,
           'post_status' => 'publish'
         ));
       }
 
-      $unpublish = array_diff($published, $selected);
+      $to_unpublish = array_diff($published, $selected);
 
-      foreach ($unpublish as $social_post) {
+      foreach ($to_unpublish as $social_post) {
         wp_update_post(array(
           'ID' => $social_post,
           'post_status' => 'draft'
@@ -149,8 +155,33 @@ class SelectPostsPage extends Page {
       }
     }
 
-    wp_redirect($_SERVER['HTTP_REFERER']);
+    $redirect = add_query_arg(array(
+      'curate_published' => count($to_publish),
+      'curate_unpublished' => count($to_unpublish)
+    ), $_SERVER['HTTP_REFERER']);
+
+    wp_redirect($redirect);
     exit;
+  }
+
+  function admin_notice_curated() {
+    $published = @$_REQUEST['curate_published'] ?: 0;
+    $unpublished = @$_REQUEST['curate_unpublished'] ?: 0;
+
+    $str = '';
+
+    if($published > 0) {
+      $str .= ' Published '.$published.' '._n('post', 'posts', $published).'.';
+    }
+
+    if($unpublished > 0) {
+      $str .= ' Unpublished '.$unpublished.' '._n('post', 'posts', $unpublished).'.';
+    }
+    ?>
+    <div class="notice notice-success is-dismissible">
+      <p><?= trim($str) ?></p>
+    </div>
+    <?
   }
 
 }

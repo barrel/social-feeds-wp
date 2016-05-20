@@ -161,8 +161,4 @@ class Page {
     <?php
   }
 
-  function render_hidden_setting($args) {
-    
-  }
-
 }
