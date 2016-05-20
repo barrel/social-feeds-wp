@@ -272,7 +272,7 @@ class SocialFeeds {
       $sync_now = new Update\TwitterFeed(array(
         'sync_start_date' => $_REQUEST['twitter_sync_now'],
         'sync_update' => @$_REQUEST['twitter_sync_update'],
-        'sync_publish' => @$_REQUEST['instagram_auto_publish']
+        'sync_publish' => @$_REQUEST['twitter_auto_publish']
       ));
 
       wp_send_json(array(
@@ -288,7 +288,7 @@ class SocialFeeds {
       $sync_now = new Update\LinkedInFeed(array(
         'sync_start_date' => $_REQUEST['linkedin_sync_now'],
         'sync_update' => @$_REQUEST['linkedin_sync_update'],
-        'sync_publish' => @$_REQUEST['instagram_auto_publish']
+        'sync_publish' => @$_REQUEST['linkedin_auto_publish']
       ));
 
       wp_send_json(array(

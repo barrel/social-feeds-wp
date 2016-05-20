@@ -43,22 +43,24 @@ class TwitterSettingsPage extends Page {
     ),
     'twitter_auto_publish' => array(
       'type' => 'checkbox',
-      'title' => 'Default Post Status',
+      'title' => 'Post Status',
       'args' => array('Automatically publish new posts', '<em>Leave unchecked to create new posts as drafts.</em>')
+    ),
+    'twitter_max_publish' => array(
+      'type' => 'number',
+      'title' => 'Post Limit',
+      'args' => array('Maximum number of posts to save', '<em>Set to "0" to keep all posts indefinitely.</em>')
     ),
     'twitter_cron' => array(
       'type' => 'cron',
-      'title' => 'Auto-Update',
+      'title' => 'Scheduled Sync',
       'args' => array('twitter')
     ),
     'twitter_sync_now' => array(
       'type' => 'sync_now',
-      'title' => 'Sync Now',
+      'title' => 'One-Time Sync',
       'args' => array('twitter')
-    ),
-    'twitter_max_publish' => array(
-      'type' => 'hidden',
-    ),
+    )
   );
 
   function add_options_page() {

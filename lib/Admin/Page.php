@@ -131,6 +131,20 @@ class Page {
     <?php
   }
 
+  function render_number_setting($args) {
+    $option = get_option( $args[0] ) ?: 0;
+
+    ?>
+    <p>
+      <label><input type="number" name="<?= $args[0] ?>" value="<?= $option ?>" min="0" max="50" step="1"> <?= $args[1] ?></label>
+      <?php if(isset($args[2])): ?>
+        <br/>
+        <?= $args[2] ?>
+      <?php endif; ?>
+      </p>
+    <?php
+  }
+
   function render_sync_now_setting($args) {
     $network = $args[1];
     ?>
@@ -144,7 +158,6 @@ class Page {
     $cron = get_option( $network.'_cron' );
     ?>
     <p>Auto-update <select name="<?= $network ?>_cron"> <option value="">Never</option> <option value="daily" <?= $cron == 'daily' ? 'selected' : '' ?>>Daily</option> <option value="twicedaily" <?= $cron == 'twicedaily' ? 'selected' : '' ?>>Twice Daily</option> <option value="hourly" <?= $cron == 'hourly' ? 'selected' : '' ?>>Hourly</option> </select></p>
-    <p><label><input type="number" name="<?= $network ?>_max_publish" max="10" min="1" step="1" value="<?= get_option( $network.'_max_publish' ) ? get_option( $network.'_max_publish' ) : 5 ?>"> Maximum number of posts to auto-publish</label></p>
     <?php
   }
 

@@ -39,8 +39,13 @@ class InstagramSettingsPage extends Page {
     ),
     'instagram_auto_publish' => array(
       'type' => 'checkbox',
-      'title' => 'Default Post Status',
+      'title' => 'Post Status',
       'args' => array('Automatically publish new posts', '<em>Leave unchecked to create new posts as drafts.</em>')
+    ),
+    'instagram_max_publish' => array(
+      'type' => 'number',
+      'title' => 'Post Limit',
+      'args' => array('Maximum number of posts to save', '<em>Set to "0" to keep all posts indefinitely.</em>')
     ),
     'instagram_cron' => array(
       'type' => 'cron',
@@ -49,12 +54,9 @@ class InstagramSettingsPage extends Page {
     ),
     'instagram_sync_now' => array(
       'type' => 'sync_now',
-      'title' => 'Sync Now',
+      'title' => 'One-Time Sync',
       'args' => array('instagram')
-    ),
-    'instagram_max_publish' => array(
-      'type' => 'hidden',
-    ),
+    )
   );
 
   function __construct() {
