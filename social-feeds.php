@@ -406,28 +406,12 @@ class SocialFeeds {
       }
     }
 
-    if( $network == 'instagram' ) {
+    $network_feed = 'Update\\'.$network.'Feed';
 
-      $sync_now = new Update\InstagramFeed(array(
-        'sync_start_date' => $sync_date,
-        'sync_publish' => get_option( $network.'_cron_publish' )
-      ));
-
-    } else if( $network == 'twitter' ) {
-
-      $sync_now = new Update\TwitterFeed(array(
-        'sync_start_date' => $sync_date,
-        'sync_publish' => get_option( $network.'_cron_publish' )
-      ));
-
-    } else if( $network == 'linkedin' ) {
-
-      $sync_now = new Update\LinkedInFeed(array(
-        'sync_start_date' => $sync_date,
-        'sync_publish' => get_option( $network.'_cron_publish' )
-      ));
-
-    }
+    $sync_now = new $network_feed(array(
+      'sync_start_date' => $sync_date,
+      'sync_publish' => get_option( $network.'_cron_publish' )
+    ));
 
   }
 
