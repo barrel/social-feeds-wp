@@ -41,18 +41,20 @@ class TwitterSettingsPage extends Page {
       'title' => 'Username(s)',
       'args' => array('<em>Enter one or more usernames separated with spaces. (Optional)</em>'),
     ),
-    'twitter_sync_now' => array(
-      'type' => 'sync_now',
-      'title' => 'Sync Now',
-      'args' => array('twitter')
+    'twitter_auto_publish' => array(
+      'type' => 'checkbox',
+      'title' => 'Default Post Status',
+      'args' => array('Automatically publish new posts', '<em>Leave unchecked to create new posts as drafts.</em>')
     ),
     'twitter_cron' => array(
       'type' => 'cron',
       'title' => 'Auto-Update',
       'args' => array('twitter')
     ),
-    'twitter_cron_publish' => array(
-      'type' => 'hidden',
+    'twitter_sync_now' => array(
+      'type' => 'sync_now',
+      'title' => 'Sync Now',
+      'args' => array('twitter')
     ),
     'twitter_max_publish' => array(
       'type' => 'hidden',

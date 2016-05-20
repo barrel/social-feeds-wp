@@ -46,16 +46,18 @@ class Page {
 
         $args = array_merge(array($id), (@$setting['args'] ?: array()), array(@$setting['hide']));
 
-        add_settings_field(
-          $id,
-          $setting['title'],
-          array($this, 'render_'.$setting['type'].'_setting'),
-          static::$menu_slug,
-          static::$settings_section,
-          $args
-        );
+        if($setting['type'] !== 'hidden') {
+          add_settings_field(
+            $id,
+            $setting['title'],
+            array($this, 'render_'.$setting['type'].'_setting'),
+            static::$menu_slug,
+            static::$settings_section,
+            $args
+          );
 
-        register_setting(static::$settings_section, $id);
+          register_setting(static::$settings_section, $id);
+        }
       }
     }
   }
@@ -114,6 +116,21 @@ class Page {
     }
   }
 
+  function render_checkbox_setting($args) {
+    $option = get_option( $args[0] );
+    $checked = $option ? 'checked' : '';
+
+    ?>
+    <p>
+      <label><input type="checkbox" name="<?= $args[0] ?>" <?= $checked ?>> <?= $args[1] ?></label>
+      <?php if(isset($args[2])): ?>
+        <br/>
+        <?= $args[2] ?>
+      <?php endif; ?>
+      </p>
+    <?php
+  }
+
   function render_sync_now_setting($args) {
     $network = $args[1];
     ?>
@@ -127,7 +144,6 @@ class Page {
     $cron = get_option( $network.'_cron' );
     ?>
     <p>Auto-update <select name="<?= $network ?>_cron"> <option value="">Never</option> <option value="daily" <?= $cron == 'daily' ? 'selected' : '' ?>>Daily</option> <option value="twicedaily" <?= $cron == 'twicedaily' ? 'selected' : '' ?>>Twice Daily</option> <option value="hourly" <?= $cron == 'hourly' ? 'selected' : '' ?>>Hourly</option> </select></p>
-    <p><label><input type="checkbox" name="<?= $network ?>_cron_publish" <?= get_option( $network.'_cron_publish' ) ? 'checked' : '' ?>> Automatically publish new posts with auto-update</label></p>
     <p><label><input type="number" name="<?= $network ?>_max_publish" max="10" min="1" step="1" value="<?= get_option( $network.'_max_publish' ) ? get_option( $network.'_max_publish' ) : 5 ?>"> Maximum number of posts to auto-publish</label></p>
     <?php
   }

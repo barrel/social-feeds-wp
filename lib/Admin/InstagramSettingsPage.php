@@ -37,11 +37,24 @@ class InstagramSettingsPage extends Page {
       'title' => 'Username(s)',
       'args' => array('<em>Enter one or more usernames separated with spaces. (Optional)</em>'),
     ),
+    'instagram_auto_publish' => array(
+      'type' => 'checkbox',
+      'title' => 'Default Post Status',
+      'args' => array('Automatically publish new posts', '<em>Leave unchecked to create new posts as drafts.</em>')
+    ),
+    'instagram_cron' => array(
+      'type' => 'cron',
+      'title' => 'Scheduled Sync',
+      'args' => array('instagram')
+    ),
     'instagram_sync_now' => array(
       'type' => 'sync_now',
       'title' => 'Sync Now',
       'args' => array('instagram')
-    )
+    ),
+    'instagram_max_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function __construct() {

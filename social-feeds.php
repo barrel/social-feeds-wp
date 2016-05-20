@@ -94,21 +94,17 @@ class SocialFeeds {
     ));
 
     /** Register the custom post type for social posts. */
-    register_taxonomy(
-        'social_types',
-        'social-post',
-        array(
-            'labels' => array(
-                'name' => 'Social Post Type',
-            ),
-            'show_ui' => false,
-            'show_tagcloud' => false,
-            'hierarchical' => false,
-            'query_var'    => false,
-            'public' => false,
-            'rewrite' => false,
-        )
-    );
+    register_taxonomy('social_types', 'social-post', array(
+      'labels' => array(
+          'name' => 'Social Post Type',
+      ),
+      'public' => false,
+      'show_ui' => false,
+      'show_tagcloud' => false,
+      'query_var'    => false,
+      'hierarchical' => false,
+      'rewrite' => false
+    ));
 
     // Add each type to taxonomy
     wp_insert_term('Instagram', 'social_types');
@@ -259,7 +255,8 @@ class SocialFeeds {
 
       $sync_now = new Update\InstagramFeed(array(
         'sync_start_date' => $_REQUEST['instagram_sync_now'],
-        'sync_update' => @$_REQUEST['instagram_sync_update']
+        'sync_update' => @$_REQUEST['instagram_sync_update'],
+        'sync_publish' => @$_REQUEST['instagram_auto_publish']
       ));
 
       wp_send_json(array(
@@ -274,7 +271,8 @@ class SocialFeeds {
 
       $sync_now = new Update\TwitterFeed(array(
         'sync_start_date' => $_REQUEST['twitter_sync_now'],
-        'sync_update' => @$_REQUEST['twitter_sync_update']
+        'sync_update' => @$_REQUEST['twitter_sync_update'],
+        'sync_publish' => @$_REQUEST['instagram_auto_publish']
       ));
 
       wp_send_json(array(
@@ -289,7 +287,8 @@ class SocialFeeds {
 
       $sync_now = new Update\LinkedInFeed(array(
         'sync_start_date' => $_REQUEST['linkedin_sync_now'],
-        'sync_update' => @$_REQUEST['linkedin_sync_update']
+        'sync_update' => @$_REQUEST['linkedin_sync_update'],
+        'sync_publish' => @$_REQUEST['instagram_auto_publish']
       ));
 
       wp_send_json(array(
@@ -317,7 +316,7 @@ class SocialFeeds {
   }
 
   /**
-   * Handle the Instagram OAuth response to retrieve an access token
+   * Retrieve an access token using the auth code from an OAuth response
    */
   function retrieve_access_token($network) {
     if($network === 'instagram') {
@@ -410,7 +409,7 @@ class SocialFeeds {
 
     $sync_now = new $network_feed(array(
       'sync_start_date' => $sync_date,
-      'sync_publish' => get_option( $network.'_cron_publish' )
+      'sync_publish' => get_option( $network.'_auto_publish' )
     ));
 
   }

@@ -37,18 +37,20 @@ class LinkedInSettingsPage extends Page {
       'title' => 'Access Token',
       'hide' => true
     ),
-    'linkedin_sync_now' => array(
-      'type' => 'sync_now',
-      'title' => 'Sync Now',
-      'args' => array('linkedin')
+    'linkedin_auto_publish' => array(
+      'type' => 'checkbox',
+      'title' => 'Default Post Status',
+      'args' => array('Automatically publish new posts', '<em>Leave unchecked to create new posts as drafts.</em>')
     ),
     'linkedin_cron' => array(
       'type' => 'cron',
       'title' => 'Auto-Update',
       'args' => array('linkedin')
     ),
-    'linkedin_cron_publish' => array(
-      'type' => 'hidden',
+    'linkedin_sync_now' => array(
+      'type' => 'sync_now',
+      'title' => 'Sync Now',
+      'args' => array('linkedin')
     ),
     'linkedin_max_publish' => array(
       'type' => 'hidden',
