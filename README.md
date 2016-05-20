@@ -15,15 +15,18 @@ Use the "Select Posts" view to curate which posts will be published to the site 
 The plugin does not currently provide any helpers for displaying the social feeds on the front-end. Instead, posts are saved to a custom post type. How these posts are displayed is left to the theme author. The following data is saved with each post:
 
 __Post Title__: [Original post content]
+
 __Post Content__: [Original post content (with linked URLs)]
+
 __Social Type__ (taxonomy): [Network]
+
 __Custom Fields__:
-	- `social_post_created`: [Original post timestamp]
-	- `social_post_details`: [Original post JSON]
-	- `social_post_permalink`: [Origial post URL]
-	- `social_post_username`: [Origial post author]
-	- `social_post_image`: [Origial post image (if any)]
-	- `social_post_video`: [Origial post video (if any)]
+- `social_post_created`: [Original post timestamp]
+- `social_post_details`: [Original post JSON]
+- `social_post_permalink`: [Origial post URL]
+- `social_post_username`: [Origial post author]
+- `social_post_image`: [Origial post image (if any)]
+- `social_post_video`: [Origial post video (if any)]
 
 ## Settings
 
