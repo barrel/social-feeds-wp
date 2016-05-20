@@ -48,7 +48,7 @@ class Page {
 
         add_settings_field(
           $id,
-          @$setting['title'] ?: $id,
+          $setting['title'],
           array($this, 'render_'.$setting['type'].'_setting'),
           static::$menu_slug,
           static::$settings_section,
@@ -128,6 +128,7 @@ class Page {
     ?>
     <p>Auto-update <select name="<?= $network ?>_cron"> <option value="">Never</option> <option value="daily" <?= $cron == 'daily' ? 'selected' : '' ?>>Daily</option> <option value="twicedaily" <?= $cron == 'twicedaily' ? 'selected' : '' ?>>Twice Daily</option> <option value="hourly" <?= $cron == 'hourly' ? 'selected' : '' ?>>Hourly</option> </select></p>
     <p><label><input type="checkbox" name="<?= $network ?>_cron_publish" <?= get_option( $network.'_cron_publish' ) ? 'checked' : '' ?>> Automatically publish new posts with auto-update</label></p>
+    <p><label><input type="number" name="<?= $network ?>_max_publish" max="10" min="1" step="1" value="<?= get_option( $network.'_max_publish' ) ? get_option( $network.'_max_publish' ) : 5 ?>"> Maximum number of posts to auto-publish</label></p>
     <?php
   }
 

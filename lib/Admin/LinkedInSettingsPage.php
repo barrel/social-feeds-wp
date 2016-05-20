@@ -50,6 +50,9 @@ class LinkedInSettingsPage extends Page {
     'linkedin_cron_publish' => array(
       'type' => 'hidden',
     ),
+    'linkedin_max_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function __construct() {

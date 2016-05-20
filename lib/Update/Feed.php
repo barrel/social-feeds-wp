@@ -58,7 +58,7 @@ class Feed {
       }
     }
 
-    $max = defined('SF_MAX_PUBLISHED') ? SF_MAX_PUBLISHED : -1;
+    $max = get_option( static::$network.'_max_publish' );
 
     $this->prune_social_post(static::$network, $max);
 
@@ -163,7 +163,7 @@ class Feed {
    */
   function prune_social_post($network = '', $max = -1) {
 
-    if($max <= 0) return;
+    if(!$max || $max <= 0) return;
     
     $latest_posts = new WP_Query( array(
       'post_type'  =>  'social-post',

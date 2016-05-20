@@ -54,6 +54,9 @@ class TwitterSettingsPage extends Page {
     'twitter_cron_publish' => array(
       'type' => 'hidden',
     ),
+    'twitter_max_publish' => array(
+      'type' => 'hidden',
+    ),
   );
 
   function add_options_page() {
