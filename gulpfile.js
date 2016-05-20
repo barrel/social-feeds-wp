@@ -11,12 +11,6 @@ gulp.task('default', ['sass:dev', 'watchify'], function() {
   gulp.watch([
     '**/*.scss'
   ], ['sass:dev']);
-
-  // When compile tasks finish, trigger livereload
-  gulp.watch([
-    'assets/**/*.css',
-    './assets/**/*.js'
-  ]);
 });
 
 gulp.task('dev', ['default']);

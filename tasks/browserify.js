@@ -2,7 +2,8 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var shim = require('browserify-shim');
-var fs = require('fs');
+var vinylSrc = require('vinyl-source-stream');
+var vinylBuffer = require('vinyl-buffer');
 var path = require('path');
 
 /** Defines the "browserify" task for Gulp. */
@@ -21,7 +22,7 @@ gulp.task('watchify', function() {
  * @param {function} cb - Async callback function.
  */
 function browserifyTask(dev, cb) {
-  var bundleOpts = {
+  var b = browserify({
     entries: './src/js/social-feeds-admin.js',
     output: './assets/js/social-feeds-admin.min.js',
     paths: ['./', './src/js/'],
@@ -31,16 +32,12 @@ function browserifyTask(dev, cb) {
       }]
     ],
     debug: true
-  };
-
-  var b = browserify(bundleOpts);
-
-  var outputFile = path.basename(bundleOpts.output);
+  });
 
   // Add minify plugin w/ source map options
   b.plugin('minifyify', {
-    map: outputFile+'.map',
-    output: bundleOpts.output+'.map',
+    map: 'social-feeds-admin.min.js.map',
+    output: './assets/js/social-feeds-admin.min.js.map',
     compressPath: function(p) {
       // Start relative paths from root
       return path.join('../../', p);
@@ -48,18 +45,16 @@ function browserifyTask(dev, cb) {
   });
 
   function bundle() {
-    bundleLogger.start(outputFile);
+    bundleLogger.start('social-feeds-admin.min.js.map');
 
-    var bundle = b.bundle()
+    return b.bundle()
       .on('error', function (err) { console.error(err.message); })
       .on('end', function() {
-        bundleLogger.end(outputFile);
-
-        if(typeof cb !== 'undefined') {
-          cb();
-        }
+        bundleLogger.end('social-feeds-admin.min.js');
       })
-      .pipe(fs.createWriteStream(bundleOpts.output));
+      .pipe(vinylSrc('social-feeds-admin.min.js'))
+      .pipe(vinylBuffer())
+      .pipe(gulp.dest('./assets/js/'));
   }
 
   if(dev) {
